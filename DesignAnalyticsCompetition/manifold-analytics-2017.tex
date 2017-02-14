@@ -1,0 +1,52 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage,url,amssymb}
+\usepackage{graphicx}
+\usepackage[pdftex]{hyperref}
+\usepackage{titlesec}
+
+\usepackage{parskip}
+
+\titleclass{\section}{top}
+\pagestyle{empty}
+
+\title{Manifold: a Language and Toolchain for Microfluidic Circuit Design}
+\date{\vspace{-10ex}}
+
+\begin{document}
+
+\maketitle
+
+{\bf Program:} Software Engineering
+
+{\bf Members:} Nik Klassen ({\tt ndklasse@uwaterloo.ca}), Michael Lyons ({\tt mjlyons@uwaterloo.ca}), Michael Prysiazny ({\tt msprysia@uwaterloo.ca}), Paul Roth ({\tt phroth@uwaterloo.ca}), Peter Socha ({\tt psocha@uwaterloo.ca})
+
+{\bf Faculty Advisor:} Derek Rayside ({\tt drayside@uwaterloo.ca})
+
+\rule{\textwidth}{1pt}
+
+% Instruction document: https://d1b10bmlvqabco.cloudfront.net/attach/ixk639stlzj1zq/h1rz9j1yc6n1uy/ixkfe4bda36q/2017_IDEAs_Design_Analytics_Competition.pdf
+
+% Concise project overview goes here
+% - Motivation and significance
+% - Purpose of analysis
+
+Manifold is an open-source high-level language for systems engineering.
+Our capstone team has been extending a prototype language initially developed by an earlier capstone team from the SE 2015 cohort.
+We have focused mainly on expanding Manifold's support for describing microfluidic circuits.
+
+The field of microfluidic circuit engineering currently suffers from a lack of accessible software tools for design and analysis.
+Engineers currently need to develop systems of equations that represent their circuits by hand.
+They must then manually solve these equations to determine the system's viability.
+With Manifold, engineers can describe their microfluidic systems in a functional programming style.
+Manifold converts this system code into inputs for the dReal satisfiability solver and the MapleSim simulator, allowing engineers to test designs without needing to physically construct the circuits.
+
+The goal of Manifold is to allow microfluidics engineers to easily find faults in their designs that would otherwise be uncovered only after a circuit's physical construction.
+With the aid of an automated analysis tool, engineers will be able to iterate more quickly and more efficiently.
+
+% TODO
+% - Analysis approach, including analysis type, tools (software) used, and analysis verification
+% - Summary of results to date
+% - Conclusions and impact
+
+\end{document}
