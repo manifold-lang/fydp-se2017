@@ -1,0 +1,3 @@
+[submodule "bib"]
+	path = bib
+	url = gitlab@git.uwaterloo.ca:derek.rayside/bib
