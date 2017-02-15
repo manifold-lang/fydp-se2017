@@ -1,6 +1,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{fullpage,url,amssymb}
+\usepackage[margin=1in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{graphicx}
 \usepackage[pdftex]{hyperref}
 \usepackage{titlesec}
@@ -11,6 +12,7 @@
 \pagestyle{empty}
 
 \title{Manifold: a Language and Toolchain for Microfluidic Circuit Design}
+\author{}
 \date{\vspace{-10ex}}
 
 \begin{document}
@@ -38,15 +40,20 @@ We have focused mainly on expanding Manifold's support for describing microfluid
 The field of microfluidic circuit engineering currently suffers from a lack of accessible software tools for design and analysis.
 Engineers currently need to develop systems of equations that represent their circuits by hand.
 They must then manually solve these equations to determine the system's viability.
-With Manifold, engineers can describe their microfluidic systems in a functional programming style.
+With Manifold, engineers will be able to describe their microfluidic systems in a functional programming style.
 Manifold converts this system code into inputs for the dReal satisfiability solver and the MapleSim simulator, allowing engineers to test designs without needing to physically construct the circuits.
-
-The goal of Manifold is to allow microfluidics engineers to easily find faults in their designs that would otherwise be uncovered only after a circuit's physical construction.
-With the aid of an automated analysis tool, engineers will be able to iterate more quickly and more efficiently.
 
 % TODO
 % - Analysis approach, including analysis type, tools (software) used, and analysis verification
 % - Summary of results to date
 % - Conclusions and impact
+
+At this time, Manifold is capable of expressing simple microfluidic circuits in its high-level design language.
+Users do not need to specify all of the circuit's parameters, but can choose to leave some blank and let Manifold help find suitable values.
+Manifold is currently able to do a single analysis pass on the design and provide an initial validation result with the help of dReal and MapleSim.
+In the future, Manifold will be able to use the results from the initial validation to refine the design's parameters, eventually creating a design that meets the user's requirements.
+
+The goal of Manifold is to allow microfluidics engineers to easily find faults in their designs that would otherwise be uncovered only after a circuit's physical construction.
+With the aid of an automated analysis tool, engineers will be able to iterate more quickly and more efficiently.
 
 \end{document}
