@@ -1,0 +1,78 @@
+% rubber : module pdftex
+\documentclass[conference]{IEEEtran}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{hyphenat}
+\usepackage{xspace}
+\usepackage{float} \floatstyle{ruled} \restylefloat{figure} \restylefloat{table}
+\usepackage{listings}
+\lstset{basicstyle=\sffamily\small,showstringspaces=false,columns=fullflexible,}
+
+\usepackage[square,sort&compress,numbers]{natbib}
+
+\usepackage[pdftex]{graphicx}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+\usepackage{xcolor}
+\definecolor{darkblue}{rgb}{0.0, 0.18, 0.39}
+\definecolor{darkgreen}{rgb}{0.18, 0.31, 0.31}
+\definecolor{light-gray}{gray}{0.75}
+
+\usepackage[pdftex]{hyperref}
+\hypersetup{
+    letterpaper=true,
+    pagebackref=false,      % links back from references to body text
+    plainpages=false,       % needed if Roman numbers in frontpages
+    pdfpagelabels=true,     % adds page number as label in Acrobat's page count
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat's bookmarks
+    pdftoolbar=true,        % show Acrobat's toolbar?
+    pdfmenubar=true,        % show Acrobat's menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=darkblue,     % color of internal links
+    citecolor=darkgreen,    % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+\hypersetup{	% override some previously defined hyperref options
+%%    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\title{Manifold SE2017}
+\author{\IEEEauthorblockN{Manifold Students, Murphy Berzish, and Derek Rayside}
+\IEEEauthorblockA{Electrical and Computer Engineering\\
+University of Waterloo, Canada\\
+\url{drayside@uwaterloo.ca}}
+}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+
+\input{intro}
+\input{conclusion}
+
+
+% disabling macros that are used only for UW Faculty of Engineering reports
+\providecommand{\StudentAuthor}{}
+\providecommand{\PostDocAuthor}{}
+\bibliographystyle{IEEEtranN}
+\bibliography{IEEEabrv,bib/strings-long,main,bib/microfluidics,bib/derek,bib/proceedings}
+
+
+\end{document}
