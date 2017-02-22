@@ -1,4 +1,29 @@
 \section{Introduction}
 
+The field of microfluidic device engineering currently suffers from a lack of accessible tools for circuit design and analysis.
+Engineers currently need to develop systems of equations that represent their circuits by hand.
+They must then manually solve these equations to determine the system's viability.
+With Manifold, engineers can describe their microfluidic systems in a functional programming style.
+Manifold converts this system code into inputs for third-party solver tools, which can then perform an analysis of the system described in the code.
+
+The Manifold toolchain begins with a high-level hardware description language.
+The engineer writes code in the Manifold frontend language to describe the desired system.
+The frontend language is domain-agnostic and does not make any domain-related assumptions.
+An engineer writing code in the frontend language does not need to specify every single detail of the device, but can instead leave them blank and allow the values to be filled in later in the toolchain.
+The Manifold frontend compiler processes the frontend code to create an intermediate schematic.
+Like the frontend language, the schematic format is generic by design, expressing all systems in terms of nodes, ports, connections, constraints, and attributes.
+When needed, domain-specific parameters can be specified in the frontend language and will be written into the schematic as object attributes.
+
+All domain-specific processing occurs in a Manifold backend compiler, which takes a schematic as input and produces domain-specific output.
+Two backend compilers currently exist for Manifold: a digital circuit backend that generates VHDL code and a microfluidics backend that generates SMT2 and Modelica code.
+All of our recent work has been on the microfluidics backend.
+The goal of the microfluidics backend is to generate code for multiple third-party solver tools.
+Code generation in the SMT2 format and integration with the dReal satisfiability solver have long been supported features.
+Code generation in Modelica for use by the MapleSim simulator is a recently-added feature.
+
+Manifold's goal is to automate much of the design process, in particular reducing the need for manual mathematical modeling and guess-and-checking.
+Instead of writing out systems equations by hand, Manifold allows engineers to write high-level system descriptions using the frontend language.
+The Manifold microfluidics toolchain can automatically generate relevant system equations in multiple output formats and allows engineers to easily leverage third-party analysis tools.
+The aim is to allow engineers to find faults in their designs more quickly, allowing them to iterate more quickly and efficiently.
 Previous paper \cite{Berzish16cascon}
 
