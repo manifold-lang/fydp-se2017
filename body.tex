@@ -1,19 +1,139 @@
 \section{Introduction}
 
+The field of microfluidic device engineering currently suffers from a lack of accessible tools for circuit design and analysis.
+Engineers currently need to develop systems of equations that represent their circuits by hand.
+They must then manually solve these equations to determine the system's viability.
+With Manifold, engineers can describe their microfluidic systems in a functional programming style.
+Manifold converts this system code into inputs for third-party solver tools, which can then perform an analysis of the system described in the code.
+
+The Manifold toolchain begins with a high-level hardware description language.
+The engineer writes code in the Manifold frontend language to describe the desired system.
+The frontend language is domain-agnostic and does not make any domain-related assumptions.
+An engineer writing code in the frontend language does not need to specify every single detail of the device, but can instead leave them blank and allow the values to be filled in later in the toolchain.
+The Manifold frontend compiler processes the frontend code to create an intermediate schematic.
+Like the frontend language, the schematic format is generic by design, expressing all systems in terms of nodes, ports, connections, constraints, and attributes.
+When needed, domain-specific parameters can be specified in the frontend language and will be written into the schematic as object attributes.
+
+All domain-specific processing occurs in a Manifold backend compiler, which takes a schematic as input and produces domain-specific output.
+Two backend compilers currently exist for Manifold: a digital circuit backend that generates VHDL code and a microfluidics backend that generates SMT2 and Modelica code.
+All of our recent work has been on the microfluidics backend.
+The goal of the microfluidics backend is to generate code for multiple third-party solver tools.
+Code generation in the SMT2 format and integration with the dReal satisfiability solver have long been supported features.
+Code generation in Modelica for use by the MapleSim simulator is a recently-added feature.
+
+Manifold's goal is to automate much of the design process, in particular reducing the need for manual mathematical modeling and guess-and-checking.
+Instead of writing out systems equations by hand, Manifold allows engineers to write high-level system descriptions using the frontend language.
+The Manifold microfluidics toolchain can automatically generate relevant system equations in multiple output formats and allows engineers to easily leverage third-party analysis tools.
+The aim is to allow engineers to find faults in their designs more quickly, allowing them to iterate more quickly and efficiently.
+
+\section{The Manifold High-Level Language}
 
 
-\section{File Format}
-
-inspired by CNF
-
-disjunction over one variable
 
 
+\section{The Manifold Microfluidics Backend}
+
+\subsection{Modelica Code Generation and MapleSim Integration}
+
+Modelica is an open-source and multi-domain modeling language.
+It can be used to create and simulate models of a system.
+Manifold's existing SMT2 code generation and dReal integration are good for determining a system's basic viability, but it is incapable of going into greater depth.
+A list of SMT2 equations provides a basic sanity check, but it is not a complete model of the system.
+Generating Modelica code was of interest because it would allow the backend to create detailed end-to-end models of microfluidic systems.
+Unlike a system of SMT2 equations, a simulation of a Modelica model is capable of deeper analysis and a more fine-grained result than a binary success or failure.
+
+Modelica is open-source and there are many software frontends that support it.
+We chose to integrate Manifold with MapleSim, a proprietary simulator developed by MapleSoft.
+MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically from within Manifold's Java source code.
+As with dReal however, code can be outputted to a file and then inputted manually through a desktop interface.
+% TODO: explanation for why MapleSim was chosen over other options.
+
+Modelica models for MapleSim are straightforward to generate from a Manifold schematic.
+A MapleSim model is a list of components of various types.
+Each component has a certain number of ports and components can be connected to other components via their ports.
+The Manifold schematic format has concepts of nodes, ports, and connections, allowing a simple mapping between the two formats.
+To identify the type of a component, the Manifold microfluidics backend relies on the attributes of the nodes.
+MapleSim supports annotations on top of the core Modelica code that specify the positions of components and the settings of the simulations.
+The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics alone and usually tries filling in reasonable defaults.
+
+A Modelica model can list components and their types (e.g. circular pipe, T-junction, fluid exit points).
+A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
+The inner workings of components are specified in libraries.
+MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
+A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo.
+
+% TODO: more detail?
+
+\subsection{Inferencing with Incomplete Descriptions}
+
+With Manifold's existing SMT2 code generation, engineers can specify all the relevant details of their microfluidic devices and leave it to Manifold to determine whether such a device would be viable.
+When engineers are unsure of a value, they would need to guess it and manually check its validity.
+A common engineering use case is that the engineer is unsure of the values of one or more design parameters and would be interested in finding an acceptable range.
+For this reason, Manifold now allows certain attribute values to be blank, with the understanding that it is the responsibility of the backend to find a suitable value.
+
+The Manifold frontend language currently allows designers to opt out of specifying a value for an attribute by writing {\tt infer} instead of a concrete value.
+Inferred values are noted in the intermediate schematics as being inferred so that a Manifold backend can recognize them.
+Backend handling for inferred variable is not yet implemented but is expected to be curtain-ready.
+
+% TODO: figure with the inference flow (1/2 of the CEGAR loop).
+
+The microfluidics backend would begin by first generating SMT2 equations and asking dReal for a solution.
+If dReal states that the system of equations is not satisfiable, the backend's work is over and the system is returned to the user as invalid.
+If dReal finds the system of equations to be satisfiable, it can output a range of valid values for the inferred variables.
+The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the variables whose value is not yet known.
+The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some refinement, but a simple arbitrary solution is easy to program.
+Once values have been assigned to all the inferred variables in the schematic, the backend will be able to proceed to the next step of generating Modelica code.
+Once Modelica code has been generated, the backend will be able to call MapleSim and try simulating the system.
+If the simulation is not successful, it is possible to set different values for the inferred variables and try again.
 
 \section{Results}
 
+\section{Related Work}
 
 
-\section{Conclusion}
+
+\section{Future Work}
+
+\subsection{CEGAR Loop}
+
+The Manifold backend's toolchain flow has so far been entirely linear.
+The backend first generates SMT2 code for dReal and dReal gives it a basic first test of the system's viability.
+Once dReal finishes, its outputs are parsed, inferred variables are filled in when needed, and a Modelica model is generated for MapleSim.
+dReal and MapleSim run in a linear sequence and never run more than once.
+
+One way to extend this flow is to turn it into a loop.
+Not only would dReal output help generate inputs for MapleSim, but MapleSim would help generate new inputs for dReal.
+The first and simpler half of the loop is already part of the original linear flow.
+By interpreting MapleSim's outputs, the Manifold backend can determine how successful the simulation was relative to the engineer's expectations.
+Based on these results, the backend would revisit the systems of SMT2 equations it generated earlier.
+New values from within dReal's output ranges could be chosen for the next MapleSim generation.
+Another option is to constrain the values of inferred values into smaller ranges based on the results and run dReal again on an increasingly constrained system.
+
+CEGAR stands for counterexample-guided abstraction refinement.
+The principle is that certain systems fail a satisfiability test or simulation, the failed system serves as an example of what not to do.
+The counterexample allows the plausible ranges for certain variables to be reduced.
+Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
+Over time, the design ends up more refined.
+
+% TODO: CEGAR loop flow chart figure?
+
+\subsection{COMSOL Code Generation}
+
+COMSOL Multiphysics (``COMSOL") is a powerful and proprietary simulator and finite element analyzer.
+It supports add-ons for a wide variety of domains, including fluid mechanics.
+We are interested in applying COMSOL because it promises a more deep and thorough simulation of the microfluidic devices than what MapleSim is capable of.
+COMSOL has a Java API, so it should be possible to integrate it into Manifold's existing Java codebase and have it be called automatically.
+
+% TODO: more about how COMSOL actually works and its value proposition.
+
+We would like to add COMSOL to the CEGAR loop described above.
+COMSOL is much slower and much more thorough than dReal or MapleSim, so it would not be in the main analysis loop.
+COMSOL is best placed at the end of the analysis process, once the initial backend loop is confident in the design.
+A COMSOL run would be the last step in the verification process and a successful run would indicate a high degree of confidence in the design.
+
+We have refrained from trying to integrate with COMSOL so far, mainly due to COMSOL's complexity and steep learning curve.
+However, COMSOL integration would bring significant power and mathematical rigour to the Manifold toolchain.
+
+\section{Acknowledgments}
 
 
