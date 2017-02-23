@@ -133,6 +133,17 @@ MapleSim was able to recognize this generated circuit and perform a simulation o
 A MapleSim simulation can produce many graphs; the example below in {\tt FIGURE} plots the voltage inside of a capacitor.
 
 % TODO: insert electrical_simulation.png as a figure
+\begin{figure}[ht]
+  \caption{Maplesim schematic of a simple rectangular pipe}
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/simple-pipe.png}
+\end{figure}
+\begin{figure}[ht]
+  \caption{Maplesim simulation of a simple rectangular pipe}
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/simple-pipe-simulation.png}
+\end{figure}
+
 
 Though this is a simple example and is outside the microfluidics domain, Manifold's existing Modelica code generation can easily generate code using different libraries and can easily cope with more complex systems.
 This example is a proof-of-concept demonstrating that Manifold frontend code can be used to generate Modelica models and then MapleSim graphs.
@@ -174,6 +185,15 @@ The principle is that certain systems fail a satisfiability test or simulation, 
 The counterexample allows the plausible ranges for certain variables to be reduced.
 Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
 Over time, the design ends up more refined.
+
+% Define block styles
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
 
 \begin{figure}[!ht]
 \label{fig:cegarloop}
