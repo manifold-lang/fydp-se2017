@@ -2,7 +2,7 @@
 
 \subsection{Module System}
 
-The module system used by Manifold is simple one to facillate the distribution of libraries for users. The libraries provided by Manifold are the frontend interfaces for the backend microfluidics libraries. Distributing frontend libraries means that users do not have to learn how to write Manifold code that uses the low-level microfluidic components. One of Manifold's design goals is to provide useful high-level abstractions, and frontend libraries are another way to do this. Another design goal is to allow 
+The module system used by Manifold is simple one to facilitate the distribution of libraries for users. The libraries provided by Manifold are the frontend interfaces for the backend microfluidics libraries. Distributing frontend libraries means that users do not have to learn how to write Manifold code that uses the low-level microfluidic components. One of Manifold's design goals is to provide useful high-level abstractions, and frontend libraries are another way to do this. Another design goal is to allow 
 
 Manifold's packaging system is almost as simple as a packaging system can get. Manifold's packaging system is as simple as possible, only sightly more than including the code of another component verbatim. Manifold's import system is similar to the simple one outlined in Cardelli \cite{Cardelli:1997:PFL:263699.263735}. Each file can declare functions and values as "public". When a file imports another file, all of the values in the other file marked with public will be accessible (Figure~\ref{fig:exports}).
 
@@ -36,6 +36,38 @@ c.outputPin(in=x);
 \end{lstlisting}
 \end{figure}
 
+
+\subsection{Usability Improvements}
+
+Other word on the Manifold frontend was dedicated to improving the experience
+of Manifold programmers. Tuples are used extensively in Manifold and accessing
+elements of a tuple using numeric indexes was not often semantically meaningful
+and required the programmer to write more code. We extended Manifold with the
+ability to unpack tuples. Unpacking of tuples is common in functional
+programming language and involves declaring variables in a tuple on the
+left-hand side of an assignment expression. We also added named values to
+tuples. This means that a programmer can refer an element of a tuple using a
+index or the name of that value. Named values increase the readability of
+Manifold and offers a language construct similar to structs in C or record data
+types in Haskell or other functional languages. These language features are
+shown in Figure~\ref{fig:unpacking}.
+
+\begin{figure}[!ht]
+\label{fig:unpacking}
+\caption{A module imported into a Manifold file}
+\begin{lstlisting}
+swap = (a: Int, b: Int) -> (c: Int, d: Int) {
+    c = b;
+    d = a;
+};
+
+// Assign 2 to x and 1 to y
+(x, y) = swap(1, 2);
+
+b = (pin0=True, pin1=True);
+outputPin(out=b.pin0);
+\end{lstlisting}
+\end{figure}
 
 \section{The Manifold Microfluidics Backend}
 
@@ -92,11 +124,6 @@ If the simulation is not successful, it is possible to set different values for 
 
 \section{Results}
 
-\subsection{Frontend Language}
-
-% TODO: list frontend tests and achievements here
-
-
 \subsection{Modelica Code Generation}
 
 We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable MapleSim library.
@@ -115,6 +142,17 @@ This example is a proof-of-concept demonstrating that Manifold frontend code can
 
 
 \section{Future Work}
+
+\subsection{Manifold Language}
+
+Microfluidic circuit often have identical components that are used repeatedly. We would like to add
+looping constructs, either by creating a macro language or by creating new Manifold functions. A
+looping function can take a component as a parameter and then repeat an action on that component a
+number of times, such as connecting them to another component. This feature in Manifold would not
+only save the programming from repeating code, it also allows a programmer's design to scale up to
+a number of components that would not be feasible to write by hand. We intend for programmers to
+also be able to specifying size parameters for components as well, such as a T-junction with
+\emph{n} branches.
 
 \subsection{CEGAR Loop}
 
