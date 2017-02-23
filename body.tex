@@ -86,6 +86,46 @@ The counterexample allows the plausible ranges for certain variables to be reduc
 Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
 Over time, the design ends up more refined.
 
+% Define block styles
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
+    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+    text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+    
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes
+	\node [cloud] (start) {Begin Design};
+    \node [block, below of=start] (code) {Write Code};
+    \node [block, right of=code, node distance=3cm](compile) {Compile the Code};
+    \node [decision, below of=compile](dcompile) {Successful Compilation?};
+	\node [block, right of=dcompile, node distance=3cm](smt2_codegen){Generate SMT2};
+	\node [block, below of=smt2_codegen, node distance=3cm](dreal){DReal};
+	\node [decision, left of=dreal](dDReal){attribute assignment found?};
+	\node [block, below of=dDReal, node distance=3cm] (modelica_codegen) {Generate Modelica};
+	\node [block, below of=modelica_codegen](MapleSim) {MapleSim};
+	\node [decision, below of=MapleSim](dpass_sim){Pass Simulation?};
+	\node [cloud, below of=dpass_sim](end){Design Complete};
+	\node [block, right of=modelica_codegen, node distance=3cm] (refine){Refine Constraints};
+
+    % Draw edges
+    \path [line] (start) -- (code);
+    \path [line] (code) -- (compile);
+    \path [line] (compile) -- (dcompile);
+    \path [line] (dcompile) -| node[near start]{no} (code);
+    \path [line] (dcompile) -- node[near start]{yes} (smt2_codegen);
+    \path [line] (smt2_codegen) -- (dreal);
+    \path [line] (dreal) -- (dDReal);
+    \path [line] (dDReal) -| node[near start]{no}(code);
+    \path [line] (dDReal) -- node[near start]{yes}(modelica_codegen);
+    \path [line] (modelica_codegen) -- (MapleSim);
+    \path [line] (MapleSim) -- (dpass_sim);
+    \path [line] (dpass_sim) -- node[near start]{yes} (end);
+    \path [line] (dpass_sim) -| node[near start]{no} (refine);
+	\path [line] (refine) -- (dreal);
+\end{tikzpicture}
 % TODO: CEGAR loop flow chart figure?
 
 \subsection{COMSOL Code Generation}

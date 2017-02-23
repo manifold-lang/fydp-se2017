@@ -20,6 +20,10 @@
 \definecolor{light-gray}{gray}{0.75}
 
 \usepackage[pdftex]{hyperref}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
 \hypersetup{
     letterpaper=true,
     pagebackref=false,      % links back from references to body text
@@ -63,10 +67,9 @@ University of Waterloo, Canada\\
 \begin{abstract}
 \input{abstract}
 \end{abstract}
-
+\input{body}
 \input{intro}
 \input{conclusion}
-
 
 % disabling macros that are used only for UW Faculty of Engineering reports
 \providecommand{\StudentAuthor}{}
