@@ -62,8 +62,6 @@ The inner workings of components are specified in libraries.
 MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
 A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo.
 
-% TODO: more detail?
-
 \subsection{Inferencing with Incomplete Descriptions}
 
 With Manifold's existing SMT2 code generation, engineers can specify all the relevant details of their microfluidic devices and leave it to Manifold to determine whether such a device would be viable.
@@ -87,6 +85,24 @@ Once Modelica code has been generated, the backend will be able to call MapleSim
 If the simulation is not successful, it is possible to set different values for the inferred variables and try again.
 
 \section{Results}
+
+\subsection{Frontend Language}
+
+% TODO: list frontend tests and achievements here
+
+
+\subsection{Modelica Code Generation}
+
+We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable MapleSim library.
+However, we have demonstrated the viability of Modelica code generation by using an analog electrical circuits library instead.
+Given a simple Manifold schematic, our backend generated a Modelica model for a simple RC circuit.
+MapleSim was able to recognize this generated circuit and perform a simulation on it.
+A MapleSim simulation can produce many graphs; the example below in {\tt FIGURE} plots the voltage inside of a capacitor.
+
+% TODO: insert electrical_simulation.png as a figure
+
+Though this is a simple example and is outside the microfluidics domain, Manifold's existing Modelica code generation can easily generate code using different libraries and can easily cope with more complex systems.
+This example is a proof-of-concept demonstrating that Manifold frontend code can be used to generate Modelica models and then MapleSim graphs.
 
 \section{Related Work}
 
