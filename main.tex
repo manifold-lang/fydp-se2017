@@ -46,6 +46,35 @@
     urlcolor=black
 }
 
+\lstdefinelanguage{manifold}
+{
+  morekeywords={
+    primitive,
+    port,
+    node,
+    infer,
+    public,
+    import
+  },
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]"
+}
+
+\lstset{
+  language={manifold},
+  basicstyle=\small\ttfamily,
+  captionpos=b,
+  tabsize=2,
+  columns=fixed,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  numberstyle=\tiny\ttfamily,
+  commentstyle=\textit
+  keywordstyle=\bffamily
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,6 +94,7 @@ University of Waterloo, Canada\\
 \end{abstract}
 
 \input{intro}
+\input{body}
 \input{conclusion}
 
 
