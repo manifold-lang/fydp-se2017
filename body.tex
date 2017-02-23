@@ -23,7 +23,7 @@ hiddenVar = 2
 \end{lstlisting}
 \end{figure}
 
-We do not compile modules separately, and types of modules are all in a global namespace, types with the same name in multiple files are not allowed. Code from the imported module however is namespaced. Manifold interprets imports as expressions, like all language constructs. Even in other functional programming languages like Haskell and OCaml imports are statements; imports do not return a value.  Imports returning values allow the module's exports to be scoped because the value of the import statement is usually assigned to a variable.. The imported values are then referenced as properties of that variable \ref{fig:exports}. A module effectively becomes, and is used as, a record data type. In the future, it is desirable that Manifold support a similar syntax for accessing imported types using a namespacing system. Manifold's import style is similar to a module syntax for Scheme proposed by Curtis and Rauen \cite{Curtis:1990:MSS:91556.91573}. Their module system used a function called \texttt{access} to reference the values exported by another module. They also proposed a function called \texttt{open} that would reduce the verbosity of qualifying access to a module's exported values by adding the argument's exported values to the current lexical scope. Manifold does not have a similar construct.
+We do not compile modules separately, and types of modules are all in a global namespace, types with the same name in multiple files are not allowed. Code from the imported module however is namespaced. Manifold interprets imports as expressions, like all language constructs. Even in other functional programming languages like Haskell and OCaml imports are statements; imports do not return a value.  Imports returning values allow the module's exports to be scoped because the value of the import statement is usually assigned to a variable. The imported values are then referenced as properties of that variable \ref{fig:exports}. A module effectively becomes, and is used as, a record data type. In the future, it is desirable that Manifold support a similar syntax for accessing imported types using a namespacing system. Manifold's import style is similar to a module syntax for Scheme proposed by Curtis and Rauen \cite{Curtis:1990:MSS:91556.91573}. Their module system used a function called \texttt{access} to reference the values exported by another module. They also proposed a function called \texttt{open} that would reduce the verbosity of qualifying access to a module's exported values by adding the argument's exported values to the current lexical scope. Manifold does not have a similar construct.
 
 \begin{figure}[!ht]
 \label{fig:imports}
@@ -39,7 +39,7 @@ c.outputPin(in=x);
 
 \subsection{Usability Improvements}
 
-Other word on the Manifold frontend was dedicated to improving the experience
+Other work on the Manifold frontend was dedicated to improving the experience
 of Manifold programmers. Tuples are used extensively in Manifold and accessing
 elements of a tuple using numeric indexes was not often semantically meaningful
 and required the programmer to write more code. We extended Manifold with the
@@ -175,15 +175,9 @@ The counterexample allows the plausible ranges for certain variables to be reduc
 Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
 Over time, the design ends up more refined.
 
-% Define block styles
-\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
-    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
-\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
-    text width=5em, text centered, rounded corners, minimum height=4em]
-\tikzstyle{line} = [draw, -latex']
-\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
-    minimum height=2em]
-    
+\begin{figure}[!ht]
+\label{fig:cegarloop}
+\caption{The Manifold toolchain with a CEGAR loop}
 \begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
 	\node [cloud] (start) {Begin Design};
@@ -215,7 +209,7 @@ Over time, the design ends up more refined.
     \path [line] (dpass_sim) -| node[near start]{no} (refine);
 	\path [line] (refine) -- (dreal);
 \end{tikzpicture}
-% TODO: CEGAR loop flow chart figure?
+\end{figure}
 
 \subsection{COMSOL Code Generation}
 
