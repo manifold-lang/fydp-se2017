@@ -1,9 +1,8 @@
 We are describing our most recent progress on the Manifold systems design language and toolchain.
 Manifold is a generic high-level system design language built to resemble modern functional programming languages.
 It has been applied in the past to describe digital and microfluidic circuits, with most recent work focusing on microfluidics.
+The Manifold toolchain allows engineers to describe their systems in a simple and high-level abstraction using domain specific libraries.
 The syntax of the frontend language has been expanded with several useful features, including a type system, importable modules, functions, and tuples.
-For the domain-specific microfludics backend, code generation for the Modelica modeling language now helps to supplement existing code generation in SMT2 format.
-The Manifold toolchain allows engineers to describe their systems in a simple and high-level fashion.
-By integrating with third-party tools such as the dReal satisfiability solver and the MapleSim simulator, Manifold allows much of the existing analysis and verification process to be automated.
-We demonstrate Manifold's ability to convert simple frontend code into detailed and expressive schematics.
-We also demonstrate that Manifold code input can ultimately be converted into models for MapleSim and possibly for additional tools in the future.
+For the domain-specific microfludics backend, the framework now supports code generation for Modelica modeling language for running time-domain simulations.
+By integrating with tools such as the dReal satisfiability solver Manifold allows the design verification process to be automated.
+We also demonstrate the process for Manifold code input to be synthesized into schematics for MapleSim for simulation and possibly for additional tools in the future.
