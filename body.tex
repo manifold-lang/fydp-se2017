@@ -10,10 +10,10 @@ microfluidics libraries. This is similar to how programmers can define
 nodes that the backend will later recognize as components. These basic
 components would be very difficult or impossible to represent in Manifold, so
 instead we simply define an interface for the backend library. Creating
-modules in Manifold also allow researchers to share their designs and have
+modules in Manifold also allows researchers to share their designs and have
 others build on them.
 
-Manifold's module system is as simplistic as possible, slightly more
+Manifold's module system is as simple as possible, but slightly more
 sophisticated than including files verbatim like C's preprocessor does.
 The module system is similar to the one outlined in Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
@@ -62,7 +62,7 @@ c.outputPin(in=x);
 
 \subsection{Improvements to Tuples}
 
-Other work on the Manifold language was dedicated to improving the experience
+Other work on the Manifold language was dedicated to improving the user experience
 of Manifold programmers. Tuples are used extensively in Manifold and their
 elements could previously only be accessed using numeric indexes. This was not
 semantically meaningful and made using tuples more confusing. We extended
@@ -102,15 +102,13 @@ determining a system's basic viability, but the techniques are unsufficient for
 analysis of greater depth.
 A list of SMT2 equations provides a basic sanity check, but it is not a complete model of the system.
 Generating Modelica code is of interest because it would allow the backend to create simulations of the synthesized model.
-Unlike SMT2 equations, a Modelica model is more expressive, and can simulate how the system will behave with time. 
-This allows for verification analysis, 
+Modelica models are more expressive than SMT2 equations and can simulate how the system will behave with time. 
+This allows for verification analysis
 with respect to the design requirement for parameters that may vary temporally. % I am not sure what this sentence means. MP
 
 Modelica is open-source and there are many software frontends that support it.
 We chose to integrate Manifold with MapleSim, a proprietary simulator developed by MapleSoft.
 MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically from within Manifold's Java source code.
-% The main reasons for choosing this are listed in the following paragraphs (Java API+MapleSim microfluidics libraries being researched/developed). I suggest either removing this TODO or moving some of those details further up if we really think they need to be discussed immediately. MP
-% TODO: explanation for why MapleSim was chosen over other options.
 
 Modelica models for MapleSim are straightforward to generate from a Manifold schematic.
 A MapleSim model is a list of design components that can be connected to each other using their ports.
@@ -121,7 +119,7 @@ MapleSim supports annotations on top of the core Modelica code that specify the 
 The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics alone and usually tries filling in reasonable defaults.
 
 %TODO mold this paragraph to have a better flow. Currently seems disjointed
-A Modelica model can list components and their types (e.g. circular pipe, T-junction, fluid exit points).
+A Modelica model can list components and their types (e.g. circular pipes, T-junctions, fluid exit points).
 A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
 Instead, the inner workings of components are specified in libraries.
 MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
@@ -134,8 +132,8 @@ relevant details of their microfluidic devices and delegate the work of
 determining whether such a device would be viable to Manifold. When engineers
 are unsure of a value they need to make a guess and manually check its
 validity. A common engineering use case is that the engineer is unsure of the
-values of one or more design parameters, and would be interested in finding an
-acceptable range. To accomodate this workflow Manifold now allows certain
+values of one or more design parameters and is interested in finding an
+acceptable range. To accommodate this workflow Manifold now allows certain
 attribute values to be unspecified, with the understanding that it is the
 responsibility of the backend to find a suitable value.
 
@@ -143,10 +141,7 @@ The Manifold frontend language currently allows designers to opt out of
 specifying a value for an attribute by writing {\tt infer} instead of a
 concrete value. Inferred values are noted in the intermediate schematics as
 being inferred so that a Manifold backend can recognize them. Backend handling
-for inferred variable is not yet implemented but is expected to be implemented
-by curtain- ready.
-
-% TODO: figure with the inference flow (1/2 of the CEGAR loop).
+for inferred variable is not yet implemented but is expected to be curtain-ready.
 
 The microfluidics backend would begin by first generating SMT2 equations and asking dReal for a solution.
 If dReal states that the system of equations is not satisfiable, the backend's work is over and the system is returned to the user as invalid.
@@ -161,27 +156,21 @@ If the simulation is not successful, it is possible to set different values for 
 
 \subsection{Modelica Code Generation}
 
-We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable MapleSim library.
-However, we have demonstrated the viability of Modelica code generation by using an analog electrical circuits library instead.
-Given a simple Manifold schematic, our backend generated a Modelica model for a simple RC circuit.
-MapleSim was able to recognize this generated circuit and perform a simulation on it.
-A MapleSim simulation can produce many graphs; the example below in {\tt FIGURE} plots the voltage inside of a capacitor.
+We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable complete MapleSim library.
+MapleSim representations for simple fluid components such as rectangular pipes exist, but models of more complex components such as T-junctions are still in progress.
+We have demonstrated the viability of Modelica code generation by using libraries from different domains, such as hydraulics and electrical circuits.
+We have been able to use the Manifold microfluidics backend to generate simple circuits that are capable of being successfully simulated in MapleSim to produce graphs.
 
-% TODO: insert electrical_simulation.png as a figure
 \begin{figure}[ht]
-  \caption{Maplesim schematic of a simple rectangular pipe}
+  \caption{MapleSim schematic of a simple rectangular pipe}
   \centering
     \includegraphics[width=0.5\textwidth]{img/simple-pipe.png}
 \end{figure}
 \begin{figure}[ht]
-  \caption{Maplesim simulation of a simple rectangular pipe}
+  \caption{MapleSim simulation of a simple rectangular pipe}
   \centering
     \includegraphics[width=0.5\textwidth]{img/simple-pipe-simulation.png}
 \end{figure}
-
-
-Though this is a simple example and is outside the microfluidics domain, Manifold's existing Modelica code generation can easily generate code using different libraries and can easily cope with more complex systems.
-This example is a proof-of-concept demonstrating that Manifold frontend code can be used to generate Modelica models and then MapleSim graphs.
 
 \section{Related Work}
 
@@ -191,15 +180,15 @@ This example is a proof-of-concept demonstrating that Manifold frontend code can
 
 \subsection{Manifold Language}
 
-Microfluidic circuit often have identical components that are used repeatedly.
+Microfluidic circuits often have identical components that are used repeatedly.
 We would like to add looping constructs to Manifold, either by creating a
-macro system or by creating new builtin Manifold functions. A looping function
+macro system or by creating new built-in Manifold functions. A looping function
 can take a component as a parameter and then repeat an action on that
 component a number of times, such as connecting them to another component.
-This feature in Manifold would not only save the programming from repeating
-code, it also allows a programmer's design to scale up to a number of
+This feature in Manifold would not only save the programmer from repeating
+code, but it also allows a programmer's design to scale up to a number of
 components that would not be feasible to write by hand. We intend for
-programmers to also be able to specifying size parameters for components as
+programmers to also be able to specify size parameters for components as
 well, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
@@ -242,7 +231,7 @@ Over time, the design ends up more refined.
     \node [block, right of=code, node distance=3cm](compile) {Compile the Code};
     \node [decision, below of=compile](dcompile) {Successful Compilation?};
 	\node [block, right of=dcompile, node distance=3cm](smt2_codegen){Generate SMT2};
-	\node [block, below of=smt2_codegen, node distance=3cm](dreal){DReal};
+	\node [block, below of=smt2_codegen, node distance=3cm](dreal){dReal};
 	\node [decision, left of=dreal](dDReal){attribute assignment found?};
 	\node [block, below of=dDReal, node distance=3cm] (modelica_codegen) {Generate Modelica};
 	\node [block, below of=modelica_codegen](MapleSim) {MapleSim};

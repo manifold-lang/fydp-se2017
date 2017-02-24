@@ -7,6 +7,7 @@ With Manifold, engineers can describe their microfluidic systems in a functional
 Manifold converts this system code into inputs for third-party solver tools, which can then perform an analysis of the system described in the code.
 The Manifold framework was first introduced by Berzish et. al in \cite{Berzish16cascon}.
 This work follows up on the recent features that have been added to the toolchain.
+
 The Manifold toolchain begins with a high-level hardware description language.
 The engineer writes code in the Manifold frontend language to describe the desired system.
 The frontend language is domain-agnostic and does not make any domain-related assumptions.
@@ -22,8 +23,7 @@ The goal of the microfluidics backend is to generate code for multiple third-par
 Code generation in the SMT2 format and integration with the dReal satisfiability solver have long been supported features.
 Code generation in Modelica for use by the MapleSim simulator is a recently-added feature.
 
-Manifold's goal is to automate much of the design process, in particular reducing the need for manual mathematical modelling and guess-and-check work.
+Manifold's goal is to automate much of the design process, in particular reducing the need for manual mathematical modeling and guess-and-check work.
 Instead of writing out systems equations by hand, Manifold allows engineers to write high-level system descriptions using the frontend language.
 The Manifold microfluidics toolchain automatically generates relevant system equations and allows engineers to easily leverage third-party analysis tools.
-The aim is to allow engineers to verify their designs quickly, so that they may iterate more efficiently.
-
+The aim is to allow engineers to verify their designs quickly so that they may iterate more efficiently.
