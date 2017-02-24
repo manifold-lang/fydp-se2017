@@ -60,6 +60,33 @@ x = c.x;
 c.outputPin(in=x);
 \end{lstlisting}
 
+\subsection{Type System}
+
+The type system
+
+- Why does Manifold support types? How is this useful for users, and how does it fit into Manifold's design goals?
+Explain how Manifold's type system works
+
+\begin{figure}[!ht]
+\label{fig:exports}
+\caption{Example of types in a Manifold file}
+\begin{lstlisting}
+public digitalIn = primitive port Bool;
+public digitalOut = primitive port Bool;
+
+public inputPin = primitive node (Nil) -> (out: digitalIn);
+public outputPin = primitive node (in: digitalOut) -> (Nil);
+
+public (x, y) = (inputPin(), inputPin());
+
+// Not exported
+hiddenVar = 2
+\end{lstlisting}
+\end{figure}
+
+- Compare this type system to others
+- Maybe list a feature (potentially from one of the other type systems compared) we want to add to Manifold in the future
+
 \subsection{Improvements to Tuples}
 
 Other work on the Manifold language was dedicated to improving the user experience
