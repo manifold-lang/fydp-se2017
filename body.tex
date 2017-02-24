@@ -19,7 +19,7 @@ The module system is similar to the one outlined in Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
 declare functions and values as \texttt{public}. When a module imports another
 module, all of the values in the imported module marked as public will be
-accessible (Figure~\ref{lst:exports}).
+accessible (Listing~\ref{lst:exports}).
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
 public digitalIn = primitive port Bool;
@@ -42,7 +42,8 @@ programming languages, even in other functional languages like Haskell and
 OCaml imports do not return a value.  In Manifold, import expressions allow modules
 exports to be scoped by assigning the result of the expression
 to a variable. The imported values are then referenced as properties of that
-variable \ref{lst:imports}. A module effectively becomes, and is used as, a
+variable (Listing~\ref{lst:imports}). A module effectively becomes, and is used as,
+a
 record data type. In the future, it is desirable that Manifold support a
 similar syntax for accessing imported types using a namespacing system.
 Manifold's import style is similar to a module syntax for Scheme proposed by
@@ -108,7 +109,7 @@ class. This means that a programmer can refer an element of a tuple using a
 index or the name of that element. Named elements increase the readability of
 Manifold and offers a language construct similar to structs in C or record
 data types in Haskell or other functional languages. These language features
-are shown in Figure~\ref{lst:unpacking}.
+are shown in Listing~\ref{lst:unpacking}.
 
 \begin{lstlisting}[label=lst:unpacking, caption=A module imported into a Manifold file]
 and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
@@ -119,7 +120,7 @@ halfAdder = (a: Bool, b: Bool) -> (sum: Bool, carry: Bool) {
   carry = and(in0=a, in1=b);
 };
 
-(sum, carry) = halfAdder(True, False)
+(sum, carry) = halfAdder(true, false)
 
 b = (pin0=sum, pin1=carry);
 outputPin(in=b.pin0);
