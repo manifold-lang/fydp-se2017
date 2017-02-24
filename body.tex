@@ -72,12 +72,14 @@ Manifold performs static analysis of all typed variables, ensuring that they are
 truly of the type they are labeled as, or outputting an error if this is not the
 case.
 
-The Manifold language uses a structual type system. In a structual type system a
-type is compatible with another type if for every feature in the type there is a
-compatible feature in the other type. A structual type system is different from
-the traditional type systems because it allows for supertypes and subtypes to be
-defined without modifying the original types. This allows for complex derived
-types in manifold that can be used with the different libraries of components.
+The Manifold language uses a structual type system. Structual type systems were
+created to remove some of the issues with nominal type systems \cite{Gil:2008:WIS:1449764.1449771}. In a structual
+type system a type is compatible with another type if for every feature in the
+type there is a compatible feature in the other type. A structual type system is
+different from the nominal type systems because it allows for supertypes and
+subtypes to be defined without modifying the original types. This allows for
+complex derived types in manifold that can be used with the different libraries
+of components.
 
 When a type is extended in Manifold the subtype is considered more specific and
 although the subtype is equivalent to its supertype, the supertype is not
