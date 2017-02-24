@@ -201,8 +201,8 @@ for inferred variable is not yet implemented but is expected to be curtain-ready
 
 The microfluidics backend would begin by first generating SMT2 equations and asking dReal for a solution.
 If dReal states that the system of equations is not satisfiable, the backend's work is over and the system is returned to the user as invalid.
-If dReal finds the system of equations to be satisfiable, it can output a range of valid values for the inferred variables.
-The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the variables whose value is not yet known.
+If dReal is unable to prove the system of equations is unsatisfiable, it can output a range of values for the inferred variables to be further tested.
+The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the unspecified variables.
 The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some refinement, but a simple arbitrary solution is easy to program.
 Once values have been assigned to all the inferred variables in the schematic, the backend will be able to proceed to the next step of generating Modelica code.
 Once Modelica code has been generated, the backend will be able to call MapleSim and try simulating the system.
@@ -249,10 +249,8 @@ well, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
 
-% dReal doesn't necessarily give a valid range, instead gives a range that it can't prove is wrong
-
 The Manifold backend's toolchain flow has so far been entirely linear.
-The backend first generates SMT2 code for dReal and dReal gives it a basic first test of the system's viability.
+The backend first generates SMT2 code for dReal and dReal attempts to find values it can prove will lead to the equations not being satisfiable.
 Once dReal finishes, its outputs are parsed, inferred variables are filled in when needed, and a Modelica model is generated for MapleSim.
 dReal and MapleSim run in a linear sequence and never run more than once.
 
