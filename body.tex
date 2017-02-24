@@ -83,14 +83,13 @@ type systems allow for the supertypes and subtypes of a type to be defined witho
 modifying the original type. This allows for complex derived types in Manifold that
 can be used with the different libraries of components.
 
-Manifold considers subtypes to be more specific than their supertypes,
-
-% TODO: reword this to be more clear
-When a type is extended in Manifold the subtype is considered more specific and
-although the subtype is equivalent to its supertype, the supertype is not
-compatible with the subtype and assignment cannot happen both ways. Tuple types
-are unique because they are considered compatible if the signature of the tuples
-match and all the subfields are subtypes of the subfields of the other tuple.
+Manifold allows the assignment of subtype values to a variable whose type is a
+supertype of the value's, but not vice-versa, i.e., a supertype value cannot be
+assigned to a subtype variable.
+% TODO: make the next few sentences easier to understand
+Tuple types are the exception to this, being
+considered compatible if the signature of the tuples
+match, and all the subfields are subtypes of the subfields of the other tuple.
 Unlike other structural typing systems, Manifold will not slice the fields of a
 tuple if you try to assign it to a tuple with a subset of the fields. In a
 descriptive language it would be an error to allow the user to hide components
@@ -114,10 +113,10 @@ e = (a = 2, b = (c = false));
 Bar f = (first = d, second = e);
 \end{lstlisting}
 
-Compared to <insert similar type systems>, Manifold differs in its approach.
-
-- Compare this type system to others
-- Maybe list a feature (potentially from one of the other type systems compared) we want to add to Manifold in the future
+% TODO:
+% Compared to <insert similar type systems>, Manifold differs in its approach. Explain how
+% Maybe list a feature (potentially from one of the other type systems compared) we want to add to Manifold in the future
+% Make reference to the figure
 
 \subsection{Improvements to Tuples}
 
