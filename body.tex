@@ -62,27 +62,34 @@ c.outputPin(in=x);
 
 \subsection{Type System}
 
-The type system
+In order to reduce the number of bugs making it through the compilation stage, Manifold includes a static type checking system. Similar to type-defs in the C programming language, Manifold allows its users to define and/or import types, as well as label variables as being of a certain type. Upon compilation, Manifold performs static analysis of all typed variables, ensuring that they are truly of the type they are labeled as, or outputting an error if this is not the case.
 
-- Why does Manifold support types? How is this useful for users, and how does it fit into Manifold's design goals?
-Explain how Manifold's type system works
+
 
 \begin{figure}[!ht]
 \label{fig:exports}
 \caption{Example of types in a Manifold file}
 \begin{lstlisting}
-public digitalIn = primitive port Bool;
-public digitalOut = primitive port Bool;
+// Type definitions
+Type Foo = (a: Int, b: (c: Bool));
 
-public inputPin = primitive node (Nil) -> (out: digitalIn);
-public outputPin = primitive node (in: digitalOut) -> (Nil);
+// Variable declarations
+Foo d;
+Foo e;
 
-public (x, y) = (inputPin(), inputPin());
+// Complex types
+Type Bar = (first: Foo, second: Foo);
 
-// Not exported
-hiddenVar = 2
+// Basic structural typing
+d = (a: 1, b: (c: true));
+e = (a: 2, b: (c: false));
+
+// Another example of typing system
+Bar f = (first: d, second: e);
 \end{lstlisting}
 \end{figure}
+
+Compared to <insert similar type systems>, Manifold differs in its approach.
 
 - Compare this type system to others
 - Maybe list a feature (potentially from one of the other type systems compared) we want to add to Manifold in the future
