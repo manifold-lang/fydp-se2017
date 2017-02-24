@@ -64,9 +64,32 @@ c.outputPin(in=y);
 
 \subsection{Type System}
 
-In order to reduce the number of bugs making it through the compilation stage, Manifold includes a static type checking system. Similar to type-defs in the C programming language, Manifold allows its users to define and/or import types, as well as label variables as being of a certain type. Upon compilation, Manifold performs static analysis of all typed variables, ensuring that they are truly of the type they are labeled as, or outputting an error if this is not the case.
+In order to reduce the number of bugs making it through the compilation stage,
+Manifold includes a static type checking system. Similar to type-defs in the C
+programming language, Manifold allows its users to define and/or import types,
+as well as label variables as being of a certain type. Upon compilation,
+Manifold performs static analysis of all typed variables, ensuring that they are
+truly of the type they are labeled as, or outputting an error if this is not the
+case.
 
-The Manifold language uses a structual type system. In a structual type system a type is compatible with another type if for every feature in the type there is a compatible feature in the other type. A structual type system is different from the traditional type systems because it allows for supertypes and subtypes to be defined without modifying the original types. This allows for complex derived types in manifold that can be used with the different libraries of components.
+The Manifold language uses a structual type system. Structual type systems were
+created to remove some of the issues with nominal type systems \cite{Gil:2008:WIS:1449764.1449771}. In a structual
+type system a type is compatible with another type if for every feature in the
+type there is a compatible feature in the other type. A structual type system is
+different from the nominal type systems because it allows for supertypes and
+subtypes to be defined without modifying the original types. This allows for
+complex derived types in manifold that can be used with the different libraries
+of components.
+
+When a type is extended in Manifold the subtype is considered more specific and
+although the subtype is equivalent to its supertype, the supertype is not
+compatible with the subtype and assignment cannot happen both ways. Tuple types
+are unique because they are considered compatible if the signature of the tuples
+match and all the subfields are subtypes of the subfields of the other tuple.
+Unlike other structural typing systems, Manifold will not slice the fields of a
+tuple if you try to assign it to a tuple with a subset of the fields. In a
+descriptive language it would be an error to allow the user to hide components
+and never connect them.
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
@@ -180,8 +203,8 @@ for inferred variable is not yet implemented but is expected to be curtain-ready
 
 The microfluidics backend would begin by first generating SMT2 equations and asking dReal for a solution.
 If dReal states that the system of equations is not satisfiable, the backend's work is over and the system is returned to the user as invalid.
-If dReal finds the system of equations to be satisfiable, it can output a range of valid values for the inferred variables.
-The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the variables whose value is not yet known.
+If dReal is unable to prove the system of equations is unsatisfiable, it can output a range of values for the inferred variables to be further tested.
+The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the unspecified variables.
 The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some refinement, but a simple arbitrary solution is easy to program.
 Once values have been assigned to all the inferred variables in the schematic, the backend will be able to proceed to the next step of generating Modelica code.
 Once Modelica code has been generated, the backend will be able to call MapleSim and try simulating the system.
@@ -229,10 +252,8 @@ well, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
 
-% dReal doesn't necessarily give a valid range, instead gives a range that it can't prove is wrong
-
 The Manifold backend's toolchain flow has so far been entirely linear.
-The backend first generates SMT2 code for dReal and dReal gives it a basic first test of the system's viability.
+The backend first generates SMT2 code for dReal and dReal attempts to find values it can prove will lead to the equations not being satisfiable.
 Once dReal finishes, its outputs are parsed, inferred variables are filled in when needed, and a Modelica model is generated for MapleSim.
 dReal and MapleSim run in a linear sequence and never run more than once.
 
@@ -264,11 +285,8 @@ Over time, the design ends up more refined.
 \caption{The Manifold toolchain with a CEGAR loop}
 \begin{tikzpicture}[node distance = 2cm, auto]
     % Place nodes
-	\node [cloud] (start) {Begin Design};
-    \node [block, below of=start] (code) {Write Code};
-    \node [block, right of=code, node distance=3cm](compile) {Compile the Code};
-    \node [decision, below of=compile](dcompile) {Successful Compilation?};
-	\node [block, right of=dcompile, node distance=3cm](smt2_codegen){Generate SMT2};
+	\node [cloud] (start) {Create Design in Manifold};
+	\node [block, below right of=start, node distance=3cm](smt2_codegen){Generate SMT2};
 	\node [block, below of=smt2_codegen, node distance=3cm](dreal){dReal};
 	\node [decision, left of=dreal](dDReal){attribute assignment found?};
 	\node [block, below of=dDReal, node distance=3cm] (modelica_codegen) {Generate Modelica};
@@ -278,14 +296,10 @@ Over time, the design ends up more refined.
 	\node [block, right of=modelica_codegen, node distance=3cm] (refine){Refine Constraints};
 
     % Draw edges
-    \path [line] (start) -- (code);
-    \path [line] (code) -- (compile);
-    \path [line] (compile) -- (dcompile);
-    \path [line] (dcompile) -| node[near start]{no} (code);
-    \path [line] (dcompile) -- node[near start]{yes} (smt2_codegen);
+    \path [line] (start) -- (smt2_codegen);
     \path [line] (smt2_codegen) -- (dreal);
     \path [line] (dreal) -- (dDReal);
-    \path [line] (dDReal) -| node[near start]{no}(code);
+    \path [line] (dDReal.north) -| node[near start]{no} (start);
     \path [line] (dDReal) -- node[near start]{yes}(modelica_codegen);
     \path [line] (modelica_codegen) -- (MapleSim);
     \path [line] (MapleSim) -- (dpass_sim);
