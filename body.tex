@@ -68,6 +68,9 @@ In order to reduce the number of bugs making it through the compilation stage, M
 
 The Manifold language uses a structual type system. In a structual type system a type is compatible with another type if for every feature in the type there is a compatible feature in the other type. A structual type system is different from the traditional type systems because it allows for supertypes and subtypes to be defined without modifying the original types. This allows for complex derived types in manifold that can be used with the different libraries of components.
 
+When a type is extended in Manifold the subtype is considered more specific and although the subtype is equivalent to its supertype, the supertype is not compatible with the subtype and assignment cannot happen both ways. Tuple types are unique because they are considered compatible if the signature of the tuples match and all the subfields are subtypes of the subfields of the other tuple. Unlike other structural typing systems Manifold will not slice the fields of a tuple if you
+try to assign it to a tuple with a subset of the fields. In a descriptive language it would be an error to allow the user to hide components and never connect them.
+
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
 Type NewInt = Int;
