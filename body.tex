@@ -4,8 +4,8 @@
 
 We created a basic module system for Manifold to facilitate
 distributing libraries to our users. This allows the language to provide standard
-libraries, each of which exposes an API for interacting with backend
-microfluidics libraries. This is similar to how programmers can define
+libraries, each of which will expose an API for interacting with backend
+libraries (such as the one for microfluidics, which is being developed at present). This is similar to how programmers can define
 \texttt{extern} functions in C. The Manifold libraries will define primitive
 nodes that the backend will later recognize as components. These basic
 components would be very difficult or impossible to represent in Manifold, so
@@ -82,6 +82,9 @@ type systems allow for the supertypes and subtypes of a type to be defined witho
 modifying the original type. This allows for complex derived types in Manifold that
 can be used with the different libraries of components.
 
+Manifold considers subtypes to be more specific than their supertypes,
+
+# TODO: reword this to be more clear
 When a type is extended in Manifold the subtype is considered more specific and
 although the subtype is equivalent to its supertype, the supertype is not
 compatible with the subtype and assignment cannot happen both ways. Tuple types
@@ -97,13 +100,11 @@ and never connect them.
 Type NewInt = Int;
 Type Foo = (a: Int, b: (c: Bool));
 Type FooBar = (a: NewInt, b: (c: Bool));
+Type Bar = (first: Foo, second: Foo);
 
 // Variable declarations
 Foo d;
 FooBar e;
-
-// Complex types
-Type Bar = (first: Foo, second: Foo);
 
 // Basic structural typing
 d = (a = 1, b = (c = true));
