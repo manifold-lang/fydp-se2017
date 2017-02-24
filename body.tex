@@ -104,22 +104,25 @@ determining a system's basic viability, but the techniques are unsufficient for
 analysis of greater depth.
 A list of SMT2 equations provides a basic sanity check, but it is not a complete model of the system.
 Generating Modelica code is of interest because it would allow the backend to create simulations of the synthesized model.
-Unlike a system of SMT2 equations, a simulation of a Modelica model is more expressive in simulating how the model will behave with time. 
-This allows for analysis for verification, with respect to the design requirement for parameters that may vary temporally.
+Unlike SMT2 equations, a Modelica model is more expressive, and can simulate how the system will behave with time. 
+This allows for verification analysis, 
+with respect to the design requirement for parameters that may vary temporally. % I am not sure what this sentence means. MP
 
 Modelica is open-source and there are many software frontends that support it.
 We chose to integrate Manifold with MapleSim, a proprietary simulator developed by MapleSoft.
 MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically from within Manifold's Java source code.
+% The main reasons for choosing this are listed in the following paragraphs (Java API+MapleSim microfluidics libraries being researched/developed). I suggest either removing this TODO or moving some of those details further up if we really think they need to be discussed immediately. MP
 % TODO: explanation for why MapleSim was chosen over other options.
 
 Modelica models for MapleSim are straightforward to generate from a Manifold schematic.
-A MapleSim model is a list of components of various types.
-Each component has a certain number of ports and components can be connected to other components via their ports.
+A MapleSim model is a list of design components that can be connected to each other using their ports.
 The Manifold schematic format has concepts of nodes, ports, and connections, allowing a simple mapping between the two formats.
+% I think that this can be removed. We have already said that the mapping is simple so more detail seems cumbersome. If we do decide to keep this lets disambiguate what "nodes" we are talking about (ie we are referring to the nodes in the schematic) and perhaps give a quick example (ie fluid entry component with attributes relating to liquid viscosity?) MP
 To identify the type of a component, the Manifold microfluidics backend relies on the attributes of the nodes.
 MapleSim supports annotations on top of the core Modelica code that specify the positions of components on a CAD interface and the settings of the simulations.
 The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics alone and usually tries filling in reasonable defaults.
 
+%TODO mold this paragraph to have a better flow. Currently seems disjointed
 A Modelica model can list components and their types (e.g. circular pipe, T-junction, fluid exit points).
 A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
 Instead, the inner workings of components are specified in libraries.
