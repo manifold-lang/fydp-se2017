@@ -86,14 +86,14 @@ can be used with the different libraries of components.
 Manifold allows the assignment of subtype values to a variable whose type is a
 supertype of the value's, but not vice-versa, i.e., a supertype value cannot be
 assigned to a subtype variable.
-% TODO: make the next few sentences easier to understand
 Tuple types are the exception to this, being
 considered compatible if the signature of the tuples
-match, and all the subfields are subtypes of the subfields of the other tuple.
-Unlike other structural typing systems, Manifold will not slice the fields of a
-tuple if you try to assign it to a tuple with a subset of the fields. In a
-descriptive language it would be an error to allow the user to hide components
-and never connect them.
+match, meaning that if the value tuple's subfields are assignable to each of the
+variable tuple's subfields, then the value tuple can be assigned to the variable
+tuple. As Manifold is a descriptive language, it would be an error to allow
+the user to hide components and never connect them, so the language will not slice
+the fields of a tuple A if you try to assign A to a tuple B with a subset of A's
+fields.
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
