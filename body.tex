@@ -254,7 +254,7 @@ well, such as a T-junction with \emph{n} branches.
 
 The Manifold backend's toolchain flow has so far been entirely linear.
 The backend first generates SMT2 code for dReal and dReal attempts to find values it can prove will lead to the equations not being satisfiable.
-Once dReal finishes, its outputs are parsed, inferred variables are filled in when needed, and a Modelica model is generated for MapleSim.
+Once dReal finishes, its outputs are parsed, inferred variables are synthesized when needed, and a Modelica model is generated for MapleSim.
 dReal and MapleSim run in a linear sequence and never run more than once.
 
 One way to extend this flow is to turn it into a loop.
@@ -265,7 +265,7 @@ Based on these results, the backend would revisit the systems of SMT2 equations 
 New values from within dReal's output ranges could be chosen for the next MapleSim generation.
 Another option is to constrain the values of inferred values into smaller ranges based on the results and run dReal again on an increasingly constrained system.
 
-CEGAR stands for counterexample-guided abstraction refinement.
+CEGAR stands for counterexample-guided abstraction refinement \cite{cegar}.
 The principle is that certain systems fail a satisfiability test or simulation, the failed system serves as an example of what not to do.
 The counterexample allows the plausible ranges for certain variables to be reduced.
 Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
