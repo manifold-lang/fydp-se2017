@@ -2,14 +2,26 @@
 
 \subsection{Module System}
 
-The module system used by Manifold facilitates the distribution of libraries for users. The libraries provided by Manifold are the frontend interfaces for the backend microfluidics libraries. Distributing frontend libraries means that users do not have to learn how to write Manifold code that uses the low-level microfluidic components. One of Manifold's design goals is to provide useful high-level abstractions, and frontend libraries are another way to do this. Another design goal is to allow 
+We created a basic module system for Manifold that will facilitate the
+distribution of programming libraries to our users. The libraries that will be
+provided by Manifold will expose an API for interacting with the backend
+microfluidics libraries. This is similar to how programmers can define
+\texttt{extern} functions in C. The Manifold libraries will define primitive
+nodes that the backend will later recognize as components. These basic
+components would be very difficult or impossible to represent in Manifold, so
+instead we simply define an interface for the backend library. Creating
+modules in Manifold also allow researchers to share their designs and have
+others build on them.
 
-Manifold's packaging system is almost as simple as a packaging system can get. Manifold's packaging system is as simple as possible, only sightly more than including the code of another component verbatim. Manifold's import system is similar to the simple one outlined in Cardelli \cite{Cardelli:1997:PFL:263699.263735}. Each file can declare functions and values as "public". When a file imports another file, all of the values in the other file marked with public will be accessible (Figure~\ref{fig:exports}).
+Manifold's module system is as simplistic as possible, slightly more
+sophisticated than including files verbatim like C's preprocessor does.
+The module system is similar to the one outlined in Cardelli
+\cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
+declare functions and values as \texttt{public}. When a module imports another
+module, all of the values in the imported module marked as public will be
+accessible (Figure~\ref{lst:exports}).
 
-\begin{figure}[!ht]
-\label{fig:exports}
-\caption{Exported values in a Manifold file}
-\begin{lstlisting}
+\begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
 public digitalIn = primitive port Bool;
 public digitalOut = primitive port Bool;
 
@@ -21,14 +33,27 @@ public (x, y) = (inputPin(), inputPin());
 // Not exported
 hiddenVar = 2
 \end{lstlisting}
-\end{figure}
 
-We do not compile modules separately, and types of modules are all in a global namespace, types with the same name in multiple files are not allowed. Code from the imported module however is namespaced. Manifold interprets imports as expressions, like all language constructs. Even in other functional programming languages like Haskell and OCaml imports are statements; imports do not return a value.  Imports returning values allow the module's exports to be scoped because the value of the import statement is usually assigned to a variable. The imported values are then referenced as properties of that variable \ref{fig:exports}. A module effectively becomes, and is used as, a record data type. In the future, it is desirable that Manifold support a similar syntax for accessing imported types using a namespacing system. Manifold's import style is similar to a module syntax for Scheme proposed by Curtis and Rauen \cite{Curtis:1990:MSS:91556.91573}. Their module system used a function called \texttt{access} to reference the values exported by another module. They also proposed a function called \texttt{open} that would reduce the verbosity of qualifying access to a module's exported values by adding the argument's exported values to the current lexical scope. Manifold does not have a similar construct.
+Manifold does not compile modules separately, and types defined in modules are
+added to the global namespace when they are imported. Values from the imported
+module however, are namespaced. Manifold interprets imports as expressions,
+like all language constructs. Imports are treated as statements in other
+programming languages, even in other functional languages like Haskell and
+OCaml imports do not return a value.  In Manifold, import expressions allow modules
+exports to be scoped by assigning the result of the expression
+to a variable. The imported values are then referenced as properties of that
+variable \ref{lst:imports}. A module effectively becomes, and is used as, a
+record data type. In the future, it is desirable that Manifold support a
+similar syntax for accessing imported types using a namespacing system.
+Manifold's import style is similar to a module syntax for Scheme proposed by
+Curtis and Rauen \cite{Curtis:1990:MSS:91556.91573}. Their module system used
+a function called \texttt{access} to reference the values exported by another
+module. They also proposed a function called \texttt{open} that would reduce
+the verbosity of qualifying access to a module's exported values by adding the
+argument's exported values to the current lexical scope. Manifold does not
+have a similar construct.
 
-\begin{figure}[!ht]
-\label{fig:imports}
-\caption{A module imported into a Manifold file}
-\begin{lstlisting}
+\begin{lstlisting}[label=lst:imports, caption=A module imported into a Manifold file]
 c = import "circuits";
 
 x = c.x;
@@ -37,45 +62,46 @@ c.outputPin(in=x);
 \end{figure}
 
 
-\subsection{Usability Improvements}
+\subsection{Improvements to Tuples}
 
-Other work on the Manifold frontend was dedicated to improving the experience
-of Manifold programmers. Tuples are used extensively in Manifold and accessing
-elements of a tuple using numeric indexes was not often semantically meaningful
-and required the programmer to write more code. We extended Manifold with the
-ability to unpack tuples. Unpacking of tuples is common in functional
-programming language and involves declaring variables in a tuple on the
-left-hand side of an assignment expression. We also added named values to
-tuples. This means that a programmer can refer an element of a tuple using a
-index or the name of that value. Named values increase the readability of
-Manifold and offers a language construct similar to structs in C or record data
-types in Haskell or other functional languages. These language features are
-shown in Figure~\ref{fig:unpacking}.
+Other work on the Manifold language was dedicated to improving the experience
+of Manifold programmers. Tuples are used extensively in Manifold and their
+elements could previously only be accessed using numeric indexes. This was not
+semantically meaningful and made using tuples more confusing. We extended
+Manifold with the ability to unpack tuple elements. Unpacking of a tuple's
+fields is common in functional programming languages and involves declaring
+variables with a tuple on the left-hand side of an assignment expression. We
+also added named elements to tuples, inspired by Python's \texttt{NamedTuple}
+class. This means that a programmer can refer an element of a tuple using a
+index or the name of that element. Named elements increase the readability of
+Manifold and offers a language construct similar to structs in C or record
+data types in Haskell or other functional languages. These language features
+are shown in Figure~\ref{lst:unpacking}.
 
-\begin{figure}[!ht]
-\label{fig:unpacking}
-\caption{A module imported into a Manifold file}
-\begin{lstlisting}
-swap = (a: Int, b: Int) -> (c: Int, d: Int) {
-    c = b;
-    d = a;
+\begin{lstlisting}[label=lst:unpacking, caption=A module imported into a Manifold file]
+and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
+xor = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
+
+halfAdder = (a: Bool, b: Bool) -> (sum: Bool, carry: Bool) {
+  sum = xor(in0=a, in1=b);
+  carry = and(in0=a, in1=b);
 };
 
-// Assign 2 to x and 1 to y
-(x, y) = swap(1, 2);
+(sum, carry) = halfAdder(True, False)
 
-b = (pin0=True, pin1=True);
-outputPin(out=b.pin0);
+b = (pin0=sum, pin1=carry);
+outputPin(in=b.pin0);
 \end{lstlisting}
-\end{figure}
 
 \section{The Manifold Microfluidics Backend}
 
 \subsection{Modelica Code Generation and MapleSim Integration}
 
-Modelica is an open-source and multi-domain modeling language.
-It can be used to create and simulate models of a system.
-Manifold's existing SMT2 code generation and dReal integration are good for determining a system's basic viability, but it is incapable of going into greater depth.
+Modelica is an open-source and multi-domain modeling language that can be used
+to create and simulate models of a system.
+Manifold's existing SMT2 code generation and dReal integration are suitable for
+determining a system's basic viability, but the techniques are unsufficient for
+analysis of greater depth.
 A list of SMT2 equations provides a basic sanity check, but it is not a complete model of the system.
 Generating Modelica code is of interest because it would allow the backend to create simulations of the synthesized model.
 Unlike a system of SMT2 equations, a simulation of a Modelica model is more expressive in simulating how the model will behave with time. 
@@ -96,20 +122,28 @@ The Manifold microfluidics backend usually cannot infer the values of these anno
 
 A Modelica model can list components and their types (e.g. circular pipe, T-junction, fluid exit points).
 A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
-The inner workings of components are specified in libraries.
+Instead, the inner workings of components are specified in libraries.
 MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
 A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo.
 
 \subsection{Inferencing with Incomplete Descriptions}
 
-With Manifold's existing SMT2 code generation, engineers can specify all the relevant details of their microfluidic devices and leave it to Manifold to determine whether such a device would be viable.
-When engineers are unsure of a value, they would need to guess it and manually check its validity.
-A common engineering use case is that the engineer is unsure of the values of one or more design parameters and would be interested in finding an acceptable range.
-For this reason, Manifold now allows certain attribute values to be blank, with the understanding that it is the responsibility of the backend to find a suitable value.
+With Manifold's existing SMT2 code generation, engineers can specify all the
+relevant details of their microfluidic devices and delegate the work of
+determining whether such a device would be viable to Manifold. When engineers
+are unsure of a value they need to make a guess and manually check its
+validity. A common engineering use case is that the engineer is unsure of the
+values of one or more design parameters, and would be interested in finding an
+acceptable range. To accomodate this workflow Manifold now allows certain
+attribute values to be unspecified, with the understanding that it is the
+responsibility of the backend to find a suitable value.
 
-The Manifold frontend language currently allows designers to opt out of specifying a value for an attribute by writing {\tt infer} instead of a concrete value.
-Inferred values are noted in the intermediate schematics as being inferred so that a Manifold backend can recognize them.
-Backend handling for inferred variable is not yet implemented but is expected to be curtain-ready.
+The Manifold frontend language currently allows designers to opt out of
+specifying a value for an attribute by writing {\tt infer} instead of a
+concrete value. Inferred values are noted in the intermediate schematics as
+being inferred so that a Manifold backend can recognize them. Backend handling
+for inferred variable is not yet implemented but is expected to be implemented
+by curtain- ready.
 
 % TODO: figure with the inference flow (1/2 of the CEGAR loop).
 
@@ -156,14 +190,16 @@ This example is a proof-of-concept demonstrating that Manifold frontend code can
 
 \subsection{Manifold Language}
 
-Microfluidic circuit often have identical components that are used repeatedly. We would like to add
-looping constructs, either by creating a macro language or by creating new Manifold functions. A
-looping function can take a component as a parameter and then repeat an action on that component a
-number of times, such as connecting them to another component. This feature in Manifold would not
-only save the programming from repeating code, it also allows a programmer's design to scale up to
-a number of components that would not be feasible to write by hand. We intend for programmers to
-also be able to specifying size parameters for components as well, such as a T-junction with
-\emph{n} branches.
+Microfluidic circuit often have identical components that are used repeatedly.
+We would like to add looping constructs to Manifold, either by creating a
+macro system or by creating new builtin Manifold functions. A looping function
+can take a component as a parameter and then repeat an action on that
+component a number of times, such as connecting them to another component.
+This feature in Manifold would not only save the programming from repeating
+code, it also allows a programmer's design to scale up to a number of
+components that would not be feasible to write by hand. We intend for
+programmers to also be able to specifying size parameters for components as
+well, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
 
