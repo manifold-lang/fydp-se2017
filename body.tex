@@ -8,18 +8,19 @@ libraries, each of which will expose an API for interacting with backend
 libraries (such as the one for microfluidics, which is being developed at present). This is similar to how programmers can define
 \texttt{extern} functions in C. The Manifold libraries will define primitive
 nodes that the backend will later recognize as components. These basic
-components would be very difficult or impossible to represent in Manifold, so
+components would be very difficult or impossible to represent in Manifold,
 instead we simply define an interface for the backend library. Creating
 modules in Manifold also allows researchers to share their designs and have
 others build on them.
 
-Manifold's module system is as simple as possible, but slightly more
-sophisticated than including files verbatim like C's preprocessor does.
-The module system is similar to the one outlined in Cardelli
+The module system new in Manifold 2.0 supports the essential functionality required by a module system. These
+essential features are outlined in the rest of this section.
+The Manifold module system has the basic features outlined by Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
-declare functions and values as \texttt{public}. When a module imports another
-module, all of the values in the imported module marked as public will be
-accessible. Listing~\ref{lst:exports} shows a module that exports several values, as well two
+declare functions and values as \texttt{public}, the exports. When a module imports another
+module, all of the exported values in the imported module will be
+accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this complexity
+is not currently beneficial to Manifold. Listing~\ref{lst:exports} shows a module that exports several values, as well two
 electrical nodes that use \texttt{Nil} to denote no input or output.
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
@@ -185,6 +186,22 @@ Instead, the inner workings of components are specified in libraries.
 MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
 A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo.
 
+We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable complete MapleSim library.
+MapleSim representations for simple fluid components such as rectangular pipes exist, but models of more complex components such as T-junctions are still in progress.
+We have demonstrated the viability of Modelica code generation by using libraries from different domains, such as hydraulics and electrical circuits.
+We have been able to use the Manifold microfluidics backend to generate simple circuits that are capable of being successfully simulated in MapleSim to produce graphs.
+
+\begin{figure}[!ht]
+  \caption{MapleSim schematic of a simple rectangular pipe}
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/simple-pipe.png}
+\end{figure}
+\begin{figure}[!ht]
+  \caption{MapleSim simulation of a simple rectangular pipe}
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/simple-pipe-simulation.png}
+\end{figure}
+
 \subsection{Inferencing with Incomplete Descriptions}
 
 With Manifold's existing SMT2 code generation, engineers can specify all the
@@ -211,26 +228,6 @@ The process of choosing a good single valid value from within an acceptable rang
 Once values have been assigned to all the inferred variables in the schematic, the backend will be able to proceed to the next step of generating Modelica code.
 Once Modelica code has been generated, the backend will be able to call MapleSim and try simulating the system.
 If the simulation is not successful, it is possible to set different values for the inferred variables and try again.
-
-\section{Results}
-
-\subsection{Modelica Code Generation}
-
-We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable complete MapleSim library.
-MapleSim representations for simple fluid components such as rectangular pipes exist, but models of more complex components such as T-junctions are still in progress.
-We have demonstrated the viability of Modelica code generation by using libraries from different domains, such as hydraulics and electrical circuits.
-We have been able to use the Manifold microfluidics backend to generate simple circuits that are capable of being successfully simulated in MapleSim to produce graphs.
-
-\begin{figure}[ht]
-  \caption{MapleSim schematic of a simple rectangular pipe}
-  \centering
-    \includegraphics[width=0.5\textwidth]{img/simple-pipe.png}
-\end{figure}
-\begin{figure}[ht]
-  \caption{MapleSim simulation of a simple rectangular pipe}
-  \centering
-    \includegraphics[width=0.5\textwidth]{img/simple-pipe-simulation.png}
-\end{figure}
 
 \section{Related Work}
 Manifold inherits from the mature research area in software  engineering of design automation and hardware description languages. Automated synthesis of VLSI has had significant contribution to the development of silicon devices over the last few decades \cite{MeadConway80}. There has been some work on automated synthesis in the area of microfluidics. \emph{MHDL} for example is a language for describing microfluidic circuits in a modular way, and the synthesis program treats the microfluidic circuit similar to an FPGA \cite{McDaniel13aspdac}. The expressiveness of Manifold is more generic than that of MHDL, and the underlying complexity behind the components is hidden from the programmer in the domain specific backends. The introductory publication of Manifold \cite{Berzish16cascon}, has more citations of related work in the domain of microfluidics.
@@ -272,44 +269,6 @@ The principle is that certain systems fail a satisfiability test or simulation, 
 The counterexample allows the plausible ranges for certain variables to be reduced.
 Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
 Over time, the design ends up more refined.
-
-% Define block styles
-\tikzstyle{decision} = [diamond, draw, fill=blue!20, 
-    text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
-\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
-    text width=5em, text centered, rounded corners, minimum height=4em]
-\tikzstyle{line} = [draw, -latex']
-\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
-    minimum height=2em]
-
-\begin{figure}[!ht]
-\label{fig:cegarloop}
-\caption{The Manifold toolchain with a CEGAR loop}
-\begin{tikzpicture}[node distance = 2cm, auto]
-    % Place nodes
-	\node [cloud] (start) {Create Design in Manifold};
-	\node [block, below right of=start, node distance=3cm](smt2_codegen){Generate SMT2};
-	\node [block, below of=smt2_codegen, node distance=3cm](dreal){dReal};
-	\node [decision, left of=dreal](dDReal){attribute assignment found?};
-	\node [block, below of=dDReal, node distance=3cm] (modelica_codegen) {Generate Modelica};
-	\node [block, below of=modelica_codegen](MapleSim) {MapleSim};
-	\node [decision, below of=MapleSim](dpass_sim){Pass Simulation?};
-	\node [cloud, below of=dpass_sim](end){Design Complete};
-	\node [block, right of=modelica_codegen, node distance=3cm] (refine){Refine Constraints};
-
-    % Draw edges
-    \path [line] (start) -- (smt2_codegen);
-    \path [line] (smt2_codegen) -- (dreal);
-    \path [line] (dreal) -- (dDReal);
-    \path [line] (dDReal.north) -| node[near start]{no} (start);
-    \path [line] (dDReal) -- node[near start]{yes}(modelica_codegen);
-    \path [line] (modelica_codegen) -- (MapleSim);
-    \path [line] (MapleSim) -- (dpass_sim);
-    \path [line] (dpass_sim) -- node[near start]{yes} (end);
-    \path [line] (dpass_sim) -| node[near start]{no} (refine);
-	\path [line] (refine) -- (dreal);
-\end{tikzpicture}
-\end{figure}
 
 \subsection{COMSOL Code Generation}
 
