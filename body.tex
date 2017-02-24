@@ -66,30 +66,27 @@ c.outputPin(in=y);
 
 In order to reduce the number of bugs making it through the compilation stage, Manifold includes a static type checking system. Similar to type-defs in the C programming language, Manifold allows its users to define and/or import types, as well as label variables as being of a certain type. Upon compilation, Manifold performs static analysis of all typed variables, ensuring that they are truly of the type they are labeled as, or outputting an error if this is not the case.
 
+The Manifold language uses a structual type system. In a structual type system a type is compatible with another type if for every feature in the type there is a compatible feature in the other type. A structual type system is different from the traditional type systems because it allows for supertypes and subtypes to be defined without modifying the original types. This allows for complex derived types in manifold that can be used with the different libraries of components.
 
-
-\begin{figure}[!ht]
-\label{fig:exports}
-\caption{Example of types in a Manifold file}
-\begin{lstlisting}
+\begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
+Type NewInt = Int;
 Type Foo = (a: Int, b: (c: Bool));
+Type FooBar = (a: NewInt, b: (c: Bool));
 
 // Variable declarations
 Foo d;
-Foo e;
+FooBar e;
 
 // Complex types
 Type Bar = (first: Foo, second: Foo);
 
 // Basic structural typing
-d = (a: 1, b: (c: true));
-e = (a: 2, b: (c: false));
-
-// Another example of typing system
-Bar f = (first: d, second: e);
+d = (a = 1, b = (c = true));
+e = (a = 2, b = (c = false));
+(a: Int, b: (c: Bool)) f = d;
+Bar f = (first = d, second = e);
 \end{lstlisting}
-\end{figure}
 
 Compared to <insert similar type systems>, Manifold differs in its approach.
 
