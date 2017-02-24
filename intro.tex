@@ -1,7 +1,7 @@
 \section{Introduction}
 
 The field of microfluidic device engineering currently suffers from a lack of accessible tools for circuit design and analysis.
-Engineers currently need to develop systems of equations that represent their circuits by hand.
+Engineers currently need to develop systems of equations that represent their circuits by hand.\cite{Thorsen02science}
 They must then manually solve these equations to determine the system's viability.
 With Manifold, engineers can describe their microfluidic systems in a functional programming style. 
 Manifold converts this system code into inputs for third-party solver tools, which can then perform an analysis of the system described in the code.
@@ -20,7 +20,7 @@ All domain-specific processing occurs in a Manifold backend compiler, which take
 Two backend compilers currently exist for Manifold: a digital circuit backend that generates VHDL code, and a microfluidics backend that generates SMT2 and Modelica code.
 All of our recent work has been on the microfluidics backend.
 The goal of the microfluidics backend is to generate code for multiple third-party solver tools.
-Code generation in the SMT2 format and integration with the dReal satisfiability solver have long been supported features.
+Code generation in the SMT2 format and integration with the dReal satisfiability solver \cite{Gao13dReal} have long been supported features.
 Code generation in Modelica for use by the MapleSim simulator is a recently-added feature.
 
 Manifold's goal is to automate much of the design process, in particular reducing the need for manual mathematical modeling and guess-and-check work.

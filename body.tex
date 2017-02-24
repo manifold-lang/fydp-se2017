@@ -131,7 +131,7 @@ outputPin(in=b.pin0);
 \subsection{Modelica Code Generation and MapleSim Integration}
 
 Modelica is an open-source and multi-domain modeling language that can be used
-to create and simulate models of a system.
+to create and simulate models of a system. \cite{Maplesim}\cite{modelica}
 Manifold's existing SMT2 code generation and dReal integration are suitable for
 determining a system's basic viability, but the techniques are unsufficient for
 analysis of greater depth.
@@ -208,8 +208,9 @@ We have been able to use the Manifold microfluidics backend to generate simple c
 \end{figure}
 
 \section{Related Work}
+Manifold inherits from the mature research area in software  engineering of design automation and hardware description languages. Automated synthesis of VLSI has had significant contribution to the development of silicon devices over the last few decades \cite{MeadConway80}. There has been some work on automated synthesis in the area of microfluidics. \emph{MHDL} for example is a language for describing microfluidic circuits in a modular way, and the synthesis program treats the microfluidic circuit similar to an FPGA \cite{McDaniel13aspdac}. The expressiveness of Manifold is more generic than that of MHDL, and the underlying complexity behind the components is hidden from the programmer in the domain specific backends. The introductory publication of Manifold \cite{Berzish16cascon}, has more citations of related work in the domain of microfluidics.
 
-
+In the realm of synthesis, a new paradigm in design automation is ``Aproximate hardware design''. Axilog is a tool introduced in  \cite{axilog}, which describes a procedure for aproximating design parameters using relaxibility inference analysis. This is different from Manifold's synthesis framework because the synthesis in Manifold happens using dReal, which is a combinatorial approach of equation solving using boolean satisfiability. However Axilog employs a algorithmic and interactive optimization technique for synthesis.
 
 \section{Future Work}
 
@@ -296,7 +297,7 @@ Over time, the design ends up more refined.
 
 \subsection{COMSOL Code Generation}
 
-COMSOL Multiphysics (``COMSOL") is a powerful and proprietary simulator and finite element analyzer.
+COMSOL Multiphysics (``COMSOL") \cite{comsol} is a powerful and proprietary simulator and finite element analyzer \cite{fem}.
 It supports add-ons for a wide variety of domains, including fluid mechanics.
 We are interested in applying COMSOL because it promises a more deep and thorough simulation of the microfluidic devices than what MapleSim is capable of.
 COMSOL has a Java API, so it should be possible to integrate it into Manifold's existing Java codebase and have it be called automatically.
