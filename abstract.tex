@@ -1,11 +1,22 @@
-We describe our work in creating version two of the Manifold systems design language and toolchain.
-Manifold is a generic high-level system design language built to resemble modern functional
-programming languages. It has been applied in the past to describe digital and microfluidic
-circuits, with the most recent work focusing on microfluidics. The Manifold toolchain allows
-engineers to describe their systems using simple and high-level abstractions with domain specific
-libraries. The syntax of the frontend language has been expanded with several useful features,
-including a type system, importable modules, and tuples. Manifold 2.0 supports Modelica code
-generation to run time-domain simulations in the microfluidics backend. By integrating with tools
-such as the dReal satisfiability solver, Manifold allows the design verification process to be
-increasingly automated. We also demonstrate the process of synthesizing Manifold files into
-schematics for simulation using MapleSim as well as additional tools in the future.
+Manifold is a generic high-level system design language designed to
+resemble modern functional programming languages. 
+%
+It is intended to be usable in a variety of design domains that can be
+conceptualized with components, connectors, ports, and constraints.
+%
+Domain-specific backends exist for microfluidic devices and digital
+logic circuits.
+%
+
+In Manifold 2.0 we have enhanced both the frontend language and the
+microfluidic backend.
+%
+The syntax of the frontend language has been expanded with several
+useful features, including a type system, a module system, and
+tuples as first-class values. 
+%
+The microfluidic backend has been extended to generate Modelica code,
+which can be used to run time-domain simulations in third-party tools
+such as MapleSim.
+
+
