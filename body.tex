@@ -19,7 +19,8 @@ The module system is similar to the one outlined in Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
 declare functions and values as \texttt{public}. When a module imports another
 module, all of the values in the imported module marked as public will be
-accessible (Listing~\ref{lst:exports}).
+accessible. Listing~\ref{lst:exports} shows a module that exports several values, as well two
+electrical nodes that use \texttt{Nil} to denote no input or output.
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
 public digitalIn = primitive port Bool;
@@ -28,10 +29,10 @@ public digitalOut = primitive port Bool;
 public inputPin = primitive node (Nil) -> (out: digitalIn);
 public outputPin = primitive node (in: digitalOut) -> (Nil);
 
-public (x, y) = (inputPin(), inputPin());
+public x = inputPin();
 
-// Not exported
-hiddenVar = 2
+// Constant that is not exported
+resistance = 2
 \end{lstlisting}
 
 Manifold does not compile modules separately, and types defined in modules are
@@ -57,8 +58,8 @@ have a similar construct.
 \begin{lstlisting}[label=lst:imports, caption=A module imported into a Manifold file]
 c = import "circuits";
 
-x = c.x;
-c.outputPin(in=x);
+y = c.x;
+c.outputPin(in=y);
 \end{lstlisting}
 
 \subsection{Type System}
@@ -120,9 +121,11 @@ halfAdder = (a: Bool, b: Bool) -> (sum: Bool, carry: Bool) {
   carry = and(in0=a, in1=b);
 };
 
+// Unpack the return values of halfAdder
 (sum, carry) = halfAdder(true, false)
 
 b = (pin0=sum, pin1=carry);
+// Access an element in b by name
 outputPin(in=b.pin0);
 \end{lstlisting}
 
@@ -228,6 +231,8 @@ well, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
 
+% dReal doesn't necessarily give a valid range, instead gives a range that it can't prove is wrong
+
 The Manifold backend's toolchain flow has so far been entirely linear.
 The backend first generates SMT2 code for dReal and dReal gives it a basic first test of the system's viability.
 Once dReal finishes, its outputs are parsed, inferred variables are filled in when needed, and a Modelica model is generated for MapleSim.
@@ -301,13 +306,10 @@ COMSOL has a Java API, so it should be possible to integrate it into Manifold's 
 
 % TODO: more about how COMSOL actually works and its value proposition.
 
-We would like to add COMSOL to the CEGAR loop described above.
-COMSOL is much slower and much more thorough than dReal or MapleSim, so it would not be in the main analysis loop.
-COMSOL is best placed at the end of the analysis process, once the initial backend loop is confident in the design.
-A COMSOL run would be the last step in the verification process and a successful run would indicate a high degree of confidence in the design.
-
-We have refrained from trying to integrate with COMSOL so far, mainly due to COMSOL's complexity and steep learning curve.
-However, COMSOL integration would bring significant power and mathematical rigour to the Manifold toolchain.
+We would like to add COMSOL simulation as a step after running the CEGAR loop described above.
+COMSOL is much slower and much more thorough than dReal or MapleSim, so it is impractical to include
+in the main analysis loop. A COMSOL simulation is a reasonable last step in the
+verification process as a successful run would indicate a high degree of confidence in the design.
 
 \section{Acknowledgments}
 
