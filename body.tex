@@ -18,18 +18,11 @@ The module system new in Manifold 2.0 supports the essential functionality requi
 essential features are outlined in the rest of this section.
 The Manifold module system shares the basic features outlined by Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
-<<<<<<< HEAD
-declare functions and values as \texttt{public}. When a module imports another
-module, all of the public exported values in the imported module will be
-accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this complexity
-is not currently beneficial to Manifold. Listing~\ref{lst:exports} shows a module that exports several values, as well two
-=======
 declare functions and values as \texttt{public} --- the exports. When a module imports another
 module, all of the exported values in the imported module will be
 accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this
 additional complexity is not currently beneficial to Manifold. \autoref{lst:exports} shows a module
 that exports several values, as well two
->>>>>>> General edits
 electrical nodes that use \texttt{Nil} to denote no input or output.
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
@@ -45,16 +38,6 @@ public x = inputPin();
 resistance = 2;
 \end{lstlisting}
 
-<<<<<<< HEAD
-Manifold does not compile modules separately. On import, types
-are added to the global namespace while values are added to a namespace for the
-module they were imported from. Manifold interprets all language constructs as
-expressions and imports are no exception. This differs from how imports are
-treated as statements in many other
-programming languages (even in other functional languages like Haskell and
-OCaml, imports do not return a value). In Manifold, import expressions allow module
-exports to be scoped by assigning the result of the expression
-=======
 On import, types are added to the global namespace, and the exported values are returned by the import
 expression. In Manifold all language constructs are
 expressions, and imports are no exception. This differs from how imports are
@@ -62,7 +45,6 @@ treated as statements in many other
 programming languages, even in other functional languages like Haskell and
 OCaml imports do not return a value.  Import expressions allow the
 export values of a module to be scoped by assigning the result of the expression
->>>>>>> General edits
 to a variable. The imported values are then referenced as properties of that
 variable, see \autoref{lst:imports}. A module effectively becomes, and is used as,
 a record data type. In the future, it is desirable that Manifold support a
@@ -84,60 +66,32 @@ c.outputPin(in=y);
 
 \subsection{Type System}
 
-<<<<<<< HEAD
-In order to reduce the number of bugs making it through the compilation stage,
-Manifold includes a static type checking system. Similar to type-defs in the C
-programming language, Manifold allows its users to define or import types,
-as well as label variables as being of a certain type. Upon compilation,
-Manifold performs static analysis of all typed variables, ensuring that they are
-truly of the type they are labeled as, or outputting an error if this is not the
-case.
-=======
 Manifold includes a static type checking system in order to increase the percentage of bugs found during
 the compilation stage. Similar to typedefs in the C
 programming language, Manifold allows its users to define and import types,
 as well as annotate variables with a specific type. Upon compilation,
 Manifold performs static analysis of all expression variables, inferring the type of a variable when it
 is not explicitly defined.
->>>>>>> General edits
 
 The type system demonstrated in \autoref{lst:types} is Manifold 2.0's structural typing system.
 Structural type systems were
 created to remove some of the issues with nominal type systems
 \cite{Gil:2008:WIS:1449764.1449771}. In a structural
-<<<<<<< HEAD
-type system, a type A is compatible with another B if for every feature in
-=======
-type system, a type A is compatible with another type B if for every feature in the
->>>>>>> General edits
+type system, a type A is compatible with another type B if for every feature in
 A there is a compatible feature in B. Unlike nominal type systems, structural
 type systems allow for the supertypes and subtypes of a type to be defined without
 modifying the original type. This allows for complex derived types in Manifold that
 can extend the different libraries of components.
 
-<<<<<<< HEAD
-Manifold allows the assignment of subtype values to a variable whose type is a
-supertype of the value's, but not vice-versa, (i.e. a supertype value cannot be
-assigned to a subtype variable).
-Tuple types are the exception to this rule, being
-considered compatible if the signature of the tuples
-match. If the value tuple's subfields are assignable to each of the
-variable tuple's subfields, then the value tuple can be assigned to the variable
-tuple. As Manifold is a descriptive language, it would be an error to allow
-the user to hide components and never connect them, so the language will not slice
-the fields of a tuple A if you try to assign A to a tuple B with a subset of A's
-fields.
-=======
 Manifold allows the assignment of subtype values to a variable declared with a supertype of that value,
 but not vice-versa.
 However, tuple types are the exception to this rule. Tuples are
 considered compatible if the signatures of two tuples
-match, meaning that if the value tuple's subfields are assignable to each of the
+match. If the value tuple's subfields are assignable to each of the
 other tuple's subfields, then that value can be assigned to that variable.
 Some structural typing systems will allow assignment to a type with a subset of the source's fields.
 As Manifold is a hardware description language, it would be usually be a logical error to allow
 the user to ``drop'' fields in a component.
->>>>>>> General edits
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
@@ -175,11 +129,7 @@ also added named elements to tuples, inspired by Python's \texttt{NamedTuple}
 class. Naming elements means that a programmer can refer an element of a tuple using a
 index or the name of that element. Named elements increase the readability of
 Manifold and offers a language construct similar to structs in C or record
-<<<<<<< HEAD
-data types in Haskell. These language features are shown in Listing~\ref{lst:unpacking}.
-=======
 data types in Haskell. These language features are shown in \autoref{lst:unpacking}.
->>>>>>> General edits
 
 \begin{lstlisting}[label=lst:unpacking, caption=Examples of new tuple features]
 and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
@@ -212,40 +162,24 @@ a complete model of the system.
 Generating Modelica code was of interest because it allows the backend to create simulations of the
 synthesized model.
 Modelica models are more expressive than SMT2 equations and can simulate how the system will behave with time. 
-<<<<<<< HEAD
-This allows for verification analysis
-with respect to the design requirement for parameters that may vary in time.
-=======
->>>>>>> General edits
 
 Modelica is open-source and there are many software frontends that support it.
 We chose to integrate Manifold with MapleSim, a proprietary simulator developed by MapleSoft.
 MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically by Manifold.
 
 Modelica models for MapleSim are straightforward to generate from a Manifold schematic.
-<<<<<<< HEAD
-A MapleSim model is a list of design components that can be connected to each other using their ports.
-The Manifold schematic format has concepts of nodes, ports, and connections, allowing a simple mapping between the two formats.
-=======
 A MapleSim model is a list of design components that are connected to each other using their ports.
 The Manifold schematic format also has concepts of nodes, ports, and connections, allowing a simple mapping
 between the two formats.
-% I think that this can be removed. We have already said that the mapping is simple so more detail seems cumbersome. If we do decide to keep this lets disambiguate what "nodes" we are talking about (ie we are referring to the nodes in the schematic) and perhaps give a quick example (ie fluid entry component with attributes relating to liquid viscosity?) MP
 % TODO(nik): What is CAD, can we explain this acronym?
->>>>>>> General edits
 To identify the type of a component, the Manifold microfluidics backend relies on the attributes of the nodes.
 On top of the core Modelica code, MapleSim supports annotations that specify the positions of components on a CAD interface and the settings of the simulations.
 The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics
 alone and instead tries to fill in the values with reasonable defaults.
 
-<<<<<<< HEAD
-A Modelica model can list components and their types (e.g. circular pipes, T-junctions, fluid exit points).
-A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
-=======
 A Modelica model can list components and their types (e.g. circular pipes, T-junctions, fluid exit points),
 but it does not contain specific domain knowledge or physical equations that describe how exactly these
 component works.
->>>>>>> General edits
 Instead, the inner workings of components are specified in libraries.
 MapleSim has libraries with equations for components in domains fields such as hydraulics and electrical
 circuits, both of which have some analogies to microfluidic circuits.
@@ -292,7 +226,7 @@ for inferred variables is not yet implemented but is expected to be by curtain-r
 
 The microfluidics backend will begin the processes of resolving inferred values by generating SMT2 equations
 and querying dReal for a solution.
-If dReal returns that the system of equations is not satisfiable, Manifold will notify the 
+If dReal returns that the system of equations is unsatisfiable, Manifold will notify the 
 user and ask the user to change the design. If dReal is unable to prove the system of equations is unsatisfiable,
 it will output a range of values for the inferred variables to be further tested.
 The microfluidics backend would parse the dReal output and choose values within the given ranges for the
@@ -324,7 +258,6 @@ parameters using relaxibility inference analysis. This is different from Manifol
 framework because the synthesis in Manifold happens using dReal, which is a combinatorial approach
 of equation solving using boolean satisfiability. In contrast, Axilog employs a algorithmic and
 interactive optimization technique for synthesis.
->>>>>>> General edits
 
 \section{Future Work}
 
