@@ -176,7 +176,7 @@ To identify the type of a component, the Manifold microfluidics backend relies o
 On top of the core Modelica code, MapleSim supports annotations that specify the positions of components on a CAD interface and the settings of the simulations.
 The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics alone and usually tries filling in reasonable defaults.
 
-A Modelica model can list components and their types (e.g. circular pipes, T-junctions, fluid exit points).
+A Modelica model can list components and their types (e.g. rectangular pipes, T-junctions, fluid exit points).
 A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
 Instead, the inner workings of components are specified in libraries.
 MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
@@ -212,16 +212,16 @@ responsibility of the backend to find a suitable value.
 The Manifold frontend language currently allows designers to opt out of
 specifying a value for an attribute by writing {\tt infer} instead of a
 concrete value. Inferred values are noted in the intermediate schematics as
-being inferred so that a Manifold backend can recognize them. Backend handling
-for inferred variable is not yet implemented but is expected to be curtain-ready.
+being inferred so that a Manifold backend can recognize them.
+By the end of a successful run, the backend will have populated all inferred variables with values.
 
-The microfluidics backend would begin by first generating SMT2 equations and asking dReal for a solution.
+The microfluidics backend begins by first generating SMT2 equations and asking dReal for a solution.
 If dReal states that the system of equations is unsatisfiable, the backend's work is over and the system is returned to the user as invalid.
 If dReal is unable to prove the system of equations is unsatisfiable, it can output a range of values for the inferred variables to be further tested.
-The microfluidics backend would parse the dReal output and choose values in dReal's ranges for the unspecified variables.
-The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some refinement, but a simple arbitrary solution is easy to program.
-Once values have been assigned to all the inferred variables in the schematic, the backend will be able to proceed to the next step of generating Modelica code.
-Once Modelica code has been generated, the backend will be able to call MapleSim and try simulating the system.
+The microfluidics backend parses the dReal output and chooses values in dReal's ranges for the unspecified variables.
+The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some future refinement, but a simple arbitrary solution is easy to program.
+Once values have been assigned to all the inferred variables in the schematic, the backend can proceed to the next step of generating Modelica code.
+Once Modelica code has been generated, the backend can call MapleSim using the OpenMaple API and try simulating the system.
 If the simulation is not successful, it is possible to set different values for the inferred variables and try again.
 
 \section{Related Work}
