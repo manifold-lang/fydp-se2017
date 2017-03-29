@@ -5,22 +5,24 @@
 We created a basic module system for Manifold to facilitate
 distributing libraries to our users. This allows the language to provide standard
 libraries, each of which will expose an API for interacting with backend
-libraries (such as the one for microfluidics, which is being developed at present). This is similar to how programmers can define
-\texttt{extern} functions in C. The Manifold libraries will define primitive
+libraries. We are currently developing such a library for the microfluidics backend. The API definitions
+are similarly to \texttt{extern} functions in C. The Manifold libraries
+define primitive
 nodes that the backend will later recognize as components. These basic
-components would be very difficult or impossible to represent in Manifold,
-instead we simply define an interface for the backend library. Creating
+components would be very difficult or impossible to represent solely in Manifold,
+so instead we simply define an interface for the backend library. Creating
 modules in Manifold also allows researchers to share their designs and have
 others build on them.
 
 The module system new in Manifold 2.0 supports the essential functionality required by a module system. These
 essential features are outlined in the rest of this section.
-The Manifold module system has the basic features outlined by Cardelli
+The Manifold module system shares the basic features outlined by Cardelli
 \cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
-declare functions and values as \texttt{public}. When a module imports another
-module, all of the public exported values in the imported module will be
-accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this complexity
-is not currently beneficial to Manifold. Listing~\ref{lst:exports} shows a module that exports several values, as well two
+declare functions and values as \texttt{public} --- the exports. When a module imports another
+module, all of the exported values in the imported module will be
+accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this
+additional complexity is not currently beneficial to Manifold. \autoref{lst:exports} shows a module
+that exports several values, as well two
 electrical nodes that use \texttt{Nil} to denote no input or output.
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
@@ -36,19 +38,17 @@ public x = inputPin();
 resistance = 2;
 \end{lstlisting}
 
-Manifold does not compile modules separately. On import, types
-are added to the global namespace while values are added to a namespace for the
-module they were imported from. Manifold interprets all language constructs as
-expressions and imports are no exception. This differs from how imports are
+On import, types are added to the global namespace, and the exported values are returned by the import
+expression. In Manifold all language constructs are
+expressions, and imports are no exception. This differs from how imports are
 treated as statements in many other
-programming languages (even in other functional languages like Haskell and
-OCaml, imports do not return a value). In Manifold, import expressions allow module
-exports to be scoped by assigning the result of the expression
+programming languages, even in other functional languages like Haskell and
+OCaml imports do not return a value.  Import expressions allow the
+export values of a module to be scoped by assigning the result of the expression
 to a variable. The imported values are then referenced as properties of that
-variable (Listing~\ref{lst:imports}). A module effectively becomes, and is used as,
-a
-record data type. In the future, it is desirable that Manifold support a
-similar syntax for accessing imported types using a namespacing system.
+variable, see \autoref{lst:imports}. A module effectively becomes, and is used as,
+a record data type. In the future, it is desirable that Manifold support a
+similar syntax for accessing imported types.
 Manifold's import style is similar to a module syntax for Scheme proposed by
 Curtis and Rauen \cite{Curtis:1990:MSS:91556.91573}. Their module system used
 a function called \texttt{access} to reference the values exported by another
@@ -66,34 +66,32 @@ c.outputPin(in=y);
 
 \subsection{Type System}
 
-In order to reduce the number of bugs making it through the compilation stage,
-Manifold includes a static type checking system. Similar to type-defs in the C
-programming language, Manifold allows its users to define or import types,
-as well as label variables as being of a certain type. Upon compilation,
-Manifold performs static analysis of all typed variables, ensuring that they are
-truly of the type they are labeled as, or outputting an error if this is not the
-case.
+Manifold includes a static type checking system in order to increase the percentage of bugs found during
+the compilation stage. Similar to typedefs in the C
+programming language, Manifold allows its users to define and import types,
+as well as annotate variables with a specific type. Upon compilation,
+Manifold performs static analysis of all expression variables, inferring the type of a variable when it
+is not explicitly defined.
 
-The Manifold language uses a structural type system. Structural type systems were
+The type system demonstrated in \autoref{lst:types} is Manifold 2.0's structural typing system.
+Structural type systems were
 created to remove some of the issues with nominal type systems
 \cite{Gil:2008:WIS:1449764.1449771}. In a structural
-type system, a type A is compatible with another B if for every feature in
+type system, a type A is compatible with another type B if for every feature in
 A there is a compatible feature in B. Unlike nominal type systems, structural
 type systems allow for the supertypes and subtypes of a type to be defined without
 modifying the original type. This allows for complex derived types in Manifold that
-can be used with the different libraries of components.
+can extend the different libraries of components.
 
-Manifold allows the assignment of subtype values to a variable whose type is a
-supertype of the value's, but not vice-versa, (i.e. a supertype value cannot be
-assigned to a subtype variable).
-Tuple types are the exception to this rule, being
-considered compatible if the signature of the tuples
+Manifold allows the assignment of subtype values to a variable declared with a supertype of that value,
+but not vice-versa.
+However, tuple types are the exception to this rule. Tuples are
+considered compatible if the signatures of two tuples
 match. If the value tuple's subfields are assignable to each of the
-variable tuple's subfields, then the value tuple can be assigned to the variable
-tuple. As Manifold is a descriptive language, it would be an error to allow
-the user to hide components and never connect them, so the language will not slice
-the fields of a tuple A if you try to assign A to a tuple B with a subset of A's
-fields.
+other tuple's subfields, then that value can be assigned to that variable.
+Some structural typing systems will allow assignment to a type with a subset of the source's fields.
+As Manifold is a hardware description language, it would be usually be a logical error to allow
+the user to ``drop'' fields in a component.
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
@@ -107,31 +105,31 @@ Foo d;
 FooBar e;
 
 // Basic structural typing
-d = (a = 1, b = (c = true));
-e = (a = 2, b = (c = false));
+d = (a=1, b=(c=true));
+e = (a=2, b=(c=false));
 (a: Int, b: (c: Bool)) f = d;
-Bar f = (first = d, second = e);
+Bar f = (first=d, second=e);
 \end{lstlisting}
 
 % TODO:
 % Compared to <insert similar type systems>, Manifold differs in its approach. Explain how
 % Maybe list a feature (potentially from one of the other type systems compared) we want to add to Manifold in the future
-% Make reference to the figure
 
 \subsection{Improvements to Tuples}
 
-Other work on the Manifold language was dedicated to improving the user experience
-of Manifold programmers. Tuples are used extensively in Manifold and their
+Other work on the Manifold language was dedicated to improving the programmer's experience of using
+tuples in Manifold. Tuples are used extensively in Manifold and their
 elements could previously only be accessed using numeric indexes. This was not
-semantically meaningful and made using tuples more confusing. We extended
+semantically meaningful and made the usage of tuples confusing. One way we improved the usage of tuples
+was by extending
 Manifold with the ability to unpack tuple elements. Unpacking of a tuple's
-fields is common in functional programming languages and involves declaring
+fields is a common of functional programming languages, and involves declaring
 variables with a tuple on the left-hand side of an assignment expression. We
 also added named elements to tuples, inspired by Python's \texttt{NamedTuple}
-class. This means that a programmer can refer an element of a tuple using a
+class. Naming elements means that a programmer can refer an element of a tuple using a
 index or the name of that element. Named elements increase the readability of
 Manifold and offers a language construct similar to structs in C or record
-data types in Haskell. These language features are shown in Listing~\ref{lst:unpacking}.
+data types in Haskell. These language features are shown in \autoref{lst:unpacking}.
 
 \begin{lstlisting}[label=lst:unpacking, caption=Examples of new tuple features]
 and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
@@ -154,48 +152,59 @@ outputPin(in=b.pin0);
 
 \subsection{Modelica Code Generation and MapleSim Integration}
 
-Modelica is an open-source and multi-domain modeling language that can be used
+Modelica is an open-source and multi-domain modelling language that can be used
 to create and simulate models of a system. \cite{Maplesim}\cite{modelica}
-Manifold's existing SMT2 code generation and dReal integration are suitable for
+Manifold 1.0's SMT2 code generation and dReal integration are suitable for
 determining a system's basic viability, but the techniques are insufficient for
 analysis in greater depth.
-A list of SMT2 equations provides a basic sanity check, but it is not a complete model of the system.
-Generating Modelica code is of interest because it would allow the backend to create simulations of the synthesized model.
-Modelica models are more expressive than SMT2 equations and can simulate how the system will behave with time. 
-This allows for verification analysis
-with respect to the design requirement for parameters that may vary in time.
+A list of SMT2 equations can be evaluated for the basic feasibility of a system, but they do not create
+a complete model of the system.
+Generating Modelica code was of interest because it allows the backend to create simulations of the
+synthesized model.
+Modelica models are more expressive than SMT2 equations and can simulate how the system will behave with time.
 
 Modelica is open-source and there are many software frontends that support it.
 We chose to integrate Manifold with MapleSim, a proprietary simulator developed by MapleSoft.
-MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically from within Manifold's Java source code.
+MapleSim offers a Java API called OpenMaple, allowing it to be called programmatically by Manifold.
 
 Modelica models for MapleSim are straightforward to generate from a Manifold schematic.
-A MapleSim model is a list of design components that can be connected to each other using their ports.
-The Manifold schematic format has concepts of nodes, ports, and connections, allowing a simple mapping between the two formats.
+A MapleSim model is a list of design components that are connected to each other using their ports.
+The Manifold schematic format also has concepts of nodes, ports, and connections, allowing a simple mapping
+between the two formats.
+% TODO(nik): What is CAD, can we explain this acronym?
 To identify the type of a component, the Manifold microfluidics backend relies on the attributes of the nodes.
 On top of the core Modelica code, MapleSim supports annotations that specify the positions of components on a CAD interface and the settings of the simulations.
-The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics alone and usually tries filling in reasonable defaults.
+The Manifold microfluidics backend usually cannot infer the values of these annotations from the schematics
+alone and instead tries to fill in the values with reasonable defaults.
 
-A Modelica model can list components and their types (e.g. rectangular pipes, T-junctions, fluid exit points).
-A Modelica model does not contain specific domain knowledge or physical equations that describe how exactly the component works.
+A Modelica model can list components and their types (e.g. rectangular pipes, T-junctions, fluid exit points),
+but it does not contain specific domain knowledge or physical equations that describe how exactly these
+component works.
 Instead, the inner workings of components are specified in libraries.
-MapleSim has libraries describing components within common fields such as hydraulics and electrical circuits, both of which have some analogies to microfluidic circuits.
-A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo.
+MapleSim has libraries with equations for components in domains fields such as hydraulics and electrical
+circuits, both of which have some analogies to microfluidic circuits.
+A specialized microfluidics library for MapleSim is currently under development at the University of Waterloo
+in collaboration with the Manifold team.
 
-We have not yet leveraged Modelica code generation for microfluidics because of a lack of a suitable complete MapleSim library.
+We have not yet leveraged Modelica code generation for microfluidics because of a lack of a sufficient
+MapleSim library.
 MapleSim representations for simple fluid components such as rectangular pipes exist, but models of more complex components such as T-junctions are still in progress.
-We have demonstrated the viability of Modelica code generation by using libraries from different domains, such as hydraulics and electrical circuits.
-We have been able to use the Manifold microfluidics backend to generate simple circuits that are capable of being successfully simulated in MapleSim to produce graphs.
+We have demonstrated the viability of the Manifold's backend to generate Modelica code by using
+libraries from different domains, such as hydraulics and electrical circuits. Our results for the Modelica
+code generation and simulation of a rectangular pipe are shown in \autoref{fig:pipe-schematic} and
+\autoref{fig:pipe-simulation}, respectively.
 
 \begin{figure}[!ht]
   \caption{MapleSim schematic of a simple rectangular pipe}
   \centering
     \includegraphics[width=0.5\textwidth]{img/simple-pipe.png}
+	\label{fig:pipe-schematic}
 \end{figure}
 \begin{figure}[!ht]
   \caption{MapleSim simulation of a simple rectangular pipe}
   \centering
     \includegraphics[width=0.5\textwidth]{img/simple-pipe-simulation.png}
+	\label{fig:pipe-simulation}
 \end{figure}
 
 \subsection{Inferencing with Incomplete Descriptions}
@@ -206,37 +215,48 @@ are unsure of a value they need to make a guess and manually check its
 validity. A common engineering use case is that the engineer is unsure of the
 values of one or more design parameters and is interested in finding an
 acceptable range. To accommodate this workflow Manifold now allows certain
-attribute values to be unspecified, with the understanding that it is the
+attribute values to be unspecified, and it becomes the
 responsibility of the backend to find a suitable value.
 
-The Manifold frontend language currently allows designers to opt out of
+Manifold 2.0 allows designers to opt out of
 specifying a value for an attribute by writing {\tt infer} instead of a
 concrete value. Inferred values are noted in the intermediate schematics as
-being inferred so that a Manifold backend can recognize them.
+being inferred so that a Manifold backend can recognize that there is a missing value.
 By the end of a successful run, the backend will have populated all inferred variables with values.
 
-The microfluidics backend begins by first generating SMT2 equations and asking dReal for a solution.
-If dReal states that the system of equations is unsatisfiable, the backend's work is over and the system is returned to the user as invalid.
-If dReal is unable to prove the system of equations is unsatisfiable, it can output a range of values for the inferred variables to be further tested.
-The microfluidics backend parses the dReal output and chooses values in dReal's ranges for the unspecified variables.
-The process of choosing a good single valid value from within an acceptable range is an inexact science and the algorithm will need some future refinement, but a simple arbitrary solution is easy to program.
-Once values have been assigned to all the inferred variables in the schematic, the backend can proceed to the next step of generating Modelica code.
-Once Modelica code has been generated, the backend can call MapleSim using the OpenMaple API and try simulating the system.
-If the simulation is not successful, it is possible to set different values for the inferred variables and try again.
+The microfluidics backend begins the process of resolving inferred values by generating SMT2 equations
+and querying dReal for a solution.
+If dReal returns that the system of equations is unsatisfiable, Manifold notifies the
+user and asks the user to change the design. If dReal is unable to prove the system of equations is unsatisfiable,
+it outputs a range of values for the inferred variables to be further tested.
+The microfluidics backend parses the dReal outputs and chooses values within the given ranges for the
+unspecified variables.
+The process of choosing an acceptable value from within the range given by dReal is still a matter of
+guessing, and a more sophisticated algorithm would offer a beneficial improvement over a random search.
+Once values have been assigned to all the inferred variables in the schematic, the backend then generates Modelica code.
+The backend will invokes MapleSim using the OpenMaple API to simulate the behaviour of the generated models.
+If the simulation is not successful, it is possible to select different values for the inferred variables
+and reattempt the simulation.
 
 \section{Related Work}
 
-Manifold inherits from the mature research area in software engineering of design automation and hardware description languages.
-Automated synthesis of VLSI has had significant contribution to the development of silicon devices over the last few decades \cite{MeadConway80}.
-There has been some work on automated synthesis in the area of microfluidics.
-\emph{MHDL} for example is a language for describing microfluidic circuits in a modular way, and the synthesis program treats the microfluidic circuit similar to an FPGA \cite{McDaniel13aspdac}.
-The expressiveness of Manifold is more generic than that of MHDL and the underlying complexity behind the components is hidden from the programmer in the domain-specific backends.
-The introductory publication of Manifold \cite{Berzish16cascon}, has more citations of related work in the domain of microfluidics.
+Manifold inherits from the mature research area in software engineering of
+design automation and hardware description languages. Automated synthesis of VLSI has had
+significant contribution to the development of silicon devices over the last few decades
+\cite{MeadConway80}. There has been some work on automated synthesis in the area of microfluidics.
+\emph{MHDL} for example is a language for describing microfluidic circuits in a modular way, and the
+synthesis program treats the microfluidic circuit similar to an FPGA \cite{McDaniel13aspdac}. The
+expressiveness of Manifold is more generic than that of MHDL, and the underlying complexity behind
+the components is hidden from the programmer in the domain specific backends. The introductory
+publication of Manifold \cite{Berzish16cascon}, has more citations of related work in the domain of
+microfluidics.
 
-In the realm of synthesis, a new paradigm in design automation is ``Aproximate hardware design''.
-\emph{Axilog} is a tool introduced in  \cite{axilog}, which describes a procedure for approximating design parameters using relaxability inference analysis.
-This is different from Manifold's synthesis framework because the synthesis in Manifold happens using dReal, which is a combinatorial approach of equation solving using boolean satisfiability.
-However, Axilog employs a algorithmic and interactive optimization technique for synthesis.
+In the realm of synthesis, a new paradigm in design automation is ``Approximate hardware design''.
+Axilog is a tool introduced in \cite{axilog}, which describes a procedure for approximating design
+parameters using relaxibility inference analysis. This is different from Manifold's synthesis
+framework because the synthesis in Manifold happens using dReal, which is a combinatorial approach
+of equation solving using boolean satisfiability. In contrast, Axilog employs a algorithmic and
+interactive optimization technique for synthesis.
 
 \section{Future Work}
 
@@ -244,35 +264,35 @@ However, Axilog employs a algorithmic and interactive optimization technique for
 
 Microfluidic circuits often have identical components that are used repeatedly.
 We would like to add looping constructs to Manifold, either by creating a
-macro system or by creating new built-in Manifold functions. A looping function
+macro system or by creating built-in Manifold functions. A looping function
 can take a component as a parameter and then repeat an action on that
 component a number of times, such as connecting them to another component.
-This feature in Manifold would not only save the programmer from repeating
-code, but it also allows a programmer's design to scale up to a number of
-components that would not be feasible to write by hand. We intend for
-programmers to also be able to specify size parameters for components as
-well, such as a T-junction with \emph{n} branches.
+This feature in Manifold would not only prevent the programmer from repeating
+code, but it also allow a programmer's design to scale up to a number of
+components that would not be feasible to write by hand. We also intend for
+programmers to be able to specify parameters for components, such as a T-junction with \emph{n} branches.
 
 \subsection{CEGAR Loop}
 
 The Manifold backend's toolchain flow has so far been entirely linear.
-The backend first generates SMT2 code for dReal and dReal attempts to find values it can prove will lead to the equations not being satisfiable.
-Once dReal finishes, its outputs are parsed, inferred variables are synthesized when needed, and a Modelica model is generated for MapleSim.
-dReal and MapleSim run in a linear sequence and never run more than once.
-
-One way to extend this flow is to turn it into a loop.
-Not only would dReal output help generate inputs for MapleSim, but MapleSim would help generate new inputs for dReal.
-The first and simpler half of the loop is already part of the original linear flow.
-By interpreting MapleSim's outputs, the Manifold backend can determine how successful the simulation was relative to the engineer's requirements.
+The verification workflow is only run once and the simulation results from MapleSim are only returned
+to the programmer, not evaluated by Manifold. One way to enhance this workflow is to create a feedback
+loop.
+By interpreting MapleSim's outputs, the Manifold backend can determine how successful the simulation was
+relative to the engineer's requirements.
 Based on these results, the backend would revisit the systems of SMT2 equations it generated earlier.
 New values from within dReal's output ranges could be chosen for the next MapleSim generation.
-Another option is to constrain the values of inferred values into smaller ranges based on the results and run dReal again on an increasingly constrained system.
+This process will be repeated until the validity of the system is certain to within a desired threshold.
+Another way the MapleSim results can be used is in constraining the values of inferred parameters to
+smaller ranges, and running dReal again on the increasingly constrained system.
 
-CEGAR stands for counterexample-guided abstraction refinement \cite{cegar}.
-The principle is that certain systems fail a satisfiability test or simulation, the failed system serves as an example of what not to do.
-The counterexample allows the plausible ranges for certain variables to be reduced.
-Given enough runs of a CEGAR loop, the ranges of inferred variables can be narrowed.
-Over time, the design ends up more refined.
+This process is called a CEGAR loop. CEGAR stands for counterexample-guided abstraction refinement \cite
+{cegar}.
+The principle is that when a system fails a satisfiability test or simulation, the failed system
+serves as an example of what a successful system is not.
+The counterexample helps reduce the plausible ranges for the system parameters.
+Given enough runs of a CEGAR loop, the ranges of inferred variables is within a margin that a prototype
+can feasibly be built.
 
 \subsection{COMSOL Code Generation}
 
@@ -281,7 +301,8 @@ It supports add-ons for a wide variety of domains, including fluid mechanics.
 We are interested in applying COMSOL because it promises a more deep and thorough simulation of the microfluidic devices than what MapleSim is capable of.
 COMSOL has a Java API, so it should be possible to integrate it into Manifold's existing Java codebase and have it be called automatically.
 
-We would like to add COMSOL simulation as a step after running the CEGAR loop described above.
+We would like to add COMSOL simulation as another verification step to be run after the CEGAR
+loop described previously.
 COMSOL is much slower and much more thorough than dReal or MapleSim, so it is impractical to include
-in the main analysis loop. A COMSOL simulation is a reasonable last step in the
-verification process as a successful run would indicate a high degree of confidence in the design.
+in the main analysis loop. A COMSOL simulation would give a much higher degree of confidence in the
+validity of a design.
