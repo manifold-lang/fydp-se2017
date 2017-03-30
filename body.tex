@@ -23,16 +23,14 @@ that exports several values, as well two
 electrical nodes that use \texttt{Nil} to denote no input or output.
 
 \begin{lstlisting}[label=lst:exports, caption=Exported values in a Manifold file]
-public digitalIn = primitive port Bool;
-public digitalOut = primitive port Bool;
+public microfluidPort = primitive port Bool;
 
-public inputPin = primitive node (Nil) -> (out: digitalIn);
-public outputPin = primitive node (in: digitalOut) -> (Nil);
-
-public x = inputPin();
+public tJunction = primitive node (dispersed: microfluidPort, continuous: microfluidPort) -> (output: microfluidPort);
+public fluidEntry = primitive node (viscosity: Real) -> (output: microfluidPort);
+public fluidExit = primitive node (input: microfluidPort) -> (Nil);
 
 // Constant that is not exported
-resistance = 2;
+MIN_CHANNEL_SIZE = 0.0001;
 \end{lstlisting}
 
 On import, types are added to the global namespace, and the exported values are returned by the import
@@ -55,10 +53,8 @@ argument's exported values to the current lexical scope. Manifold does not
 have a similar construct.
 
 \begin{lstlisting}[label=lst:imports, caption=A module imported into a Manifold file]
-c = import "circuits";
-
-y = c.x;
-c.outputPin(in=y);
+mf = import "microfluidics";
+mf::microfluidPort in = mf.entryPort(viscosity=2.0);
 \end{lstlisting}
 
 \subsection{Type System}
@@ -94,20 +90,17 @@ prevent user errors.
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
-Type NewInt = Int;
-Type Foo = (a: Int, b: (c: Bool));
-Type FooBar = (a: NewInt, b: (c: Bool));
-Type Bar = (first: Foo, second: Foo);
+Type Fluid = Int;
+Type Pump = (f: Fluid, control: (on: Bool));
+Type DoublePump = (first: Pump, second: Pump);
 
 // Variable declarations
-Foo d;
-FooBar e;
+DoublePump p;
 
 // Basic structural typing
-d = (a=1, b=(c=true));
-e = (a=2, b=(c=false));
-(a: Int, b: (c: Bool)) f = d;
-Bar f = (first=d, second=e);
+p1 = (fluid=1, control=(on=true));
+(fluid: Int, control: (on: Bool)) p2 = p1;
+p2 = (first=p1, second=p2);
 \end{lstlisting}
 
 % TODO:
@@ -131,20 +124,20 @@ Manifold and helps users of the language coming from languages like C that offer
 with structs or a similar data type. These tuple language features are shown in \autoref{lst:unpacking}.
 
 \begin{lstlisting}[label=lst:unpacking, caption=Examples of new tuple features]
-and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
-xor = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
+mf = import "microfluidics";
 
-halfAdder = (a: Bool, b: Bool) -> (sum: Bool, carry: Bool) {
-  sum = xor(in0=a, in1=b);
-  carry = and(in0=a, in1=b);
+// Use unpacking to do parallel assignment
+(waterViscosity, oilViscosity) = (1.002, 250.0);
+
+makeTJunction = (Nil) -> (output: mf::microfluidPort, dispersed: mf::microfluidPort, continuous: mf::microfluidPort) {
+  continuous = mf.fluidEntry(viscosity=waterViscosity);
+  dispersed = mf.fluidEntry(viscosity=oilViscosity);
+  output = mf.tJunction(output=output, dispersed=dispersed, continuous=continuous);
 };
 
-// Unpack the return values of halfAdder
-(sum, carry) = halfAdder(true, false)
-
-b = (pin0=sum, pin1=carry);
-// Access an field in b by name
-outputPin(in=b.pin0);
+tJunctionChannels = makeTJunction();
+// Access a field on the return value using the named attribute
+mf.fluidExit(tJunctionChannels.output);
 \end{lstlisting}
 
 \section{The Manifold Microfluidics Backend}
