@@ -2,22 +2,19 @@
 
 \subsection{Module System}
 
-We created a basic module system for Manifold to facilitate
-distributing libraries to our users. This allows the language to provide standard
-libraries, each of which will expose an API for interacting with backend
-libraries. We are currently developing such a library for the microfluidics backend. The API definitions
-are similarly to \texttt{extern} functions in C. The Manifold libraries
-define primitive
-nodes that the backend will later recognize as components. These basic
-components would be very difficult or impossible to represent solely in Manifold,
+Designing a microfluidic circuit requires common components to be made available to the user in the 
+form of libraries. To facilitate code reuse and sharing we created a basic module system for Manifold.
+The standard libraries for each domain will define APIs for interacting with the corresponding Manifold
+backend. We are currently developing such a library for the microfluidics backend. The Manifold libraries
+define \texttt{primitive nodes} that a backend will later recognize as components. These basic
+components would be very difficult or impossible to represent natively in Manifold,
 so instead we simply define an interface for the backend library. Creating
-modules in Manifold also allows researchers to share their designs and have
-others build on them.
+modules in Manifold also allows users to share their circuit designs and have
+others build on them, a practice that is common on microfluidics.
 
-The module system new in Manifold 2.0 supports the essential functionality required by a module system. These
-essential features are outlined in the rest of this section.
-The Manifold module system shares the basic features outlined by Cardelli
-\cite{Cardelli:1997:PFL:263699.263735}. Each module, in this case a file, can
+The module system new in Manifold 2.0 supports the essential functionality required by a module system,
+as outlined by Cardelli \cite{Cardelli:1997:PFL:263699.263735}. These
+essential features are outlined in the rest of this section. Each module, in this case a file, can
 declare functions and values as \texttt{public} --- the exports. When a module imports another
 module, all of the exported values in the imported module will be
 accessible. Other programming languages, such as Simple ML, feature more exotic module systems, but this
@@ -42,7 +39,7 @@ On import, types are added to the global namespace, and the exported values are 
 expression. In Manifold all language constructs are
 expressions, and imports are no exception. This differs from how imports are
 treated as statements in many other
-programming languages, even in other functional languages like Haskell and
+programming languages, even other functional languages like Haskell and
 OCaml imports do not return a value.  Import expressions allow the
 export values of a module to be scoped by assigning the result of the expression
 to a variable. The imported values are then referenced as properties of that
@@ -66,9 +63,11 @@ c.outputPin(in=y);
 
 \subsection{Type System}
 
-Manifold includes a static type checking system in order to increase the percentage of bugs found during
-the compilation stage. Similar to typedefs in the C
-programming language, Manifold allows its users to define and import types,
+Many user errors in Manifold 1.0 resulted in errors during backend compilation. It is very difficult
+to determine what the original problem was when an error is discovered this late in the compilation
+process. Manifold 2.0 includes a static type checking system in order to increase the percentage of bugs found during
+the compilation stage when more information can be communicated to the user about their error.
+Similar to typedefs in the C programming language, Manifold allows its users to define and import types,
 as well as annotate variables with a specific type. Upon compilation,
 Manifold performs static analysis of all expression variables, inferring the type of a variable when it
 is not explicitly defined.
@@ -79,7 +78,7 @@ created to remove some of the issues with nominal type systems
 \cite{Gil:2008:WIS:1449764.1449771}. In a structural
 type system, a type A is compatible with another type B if for every feature in
 A there is a compatible feature in B. Unlike nominal type systems, structural
-type systems allow for the supertypes and subtypes of a type to be defined without
+type systems allow for sub and supertypes to be defined without
 modifying the original type. This allows for complex derived types in Manifold that
 can extend the different libraries of components.
 
@@ -87,11 +86,11 @@ Manifold allows the assignment of subtype values to a variable declared with a s
 but not vice-versa.
 However, tuple types are the exception to this rule. Tuples are
 considered compatible if the signatures of two tuples
-match. If the value tuple's subfields are assignable to each of the
-other tuple's subfields, then that value can be assigned to that variable.
+match using structural typing rules.
 Some structural typing systems will allow assignment to a type with a subset of the source's fields.
-As Manifold is a hardware description language, it would be usually be a logical error to allow
-the user to ``drop'' fields in a component.
+Tuples are often used to describe components, and it would be usually be a logical error to allow
+fields of a component be lost in a cast. As a result, this feature of structural typing is omitted to
+prevent user errors.
 
 \begin{lstlisting}[label=lst:types,caption=Example of types in a Manifold file]
 // Type definitions
@@ -119,17 +118,17 @@ Bar f = (first=d, second=e);
 
 Other work on the Manifold language was dedicated to improving the programmer's experience of using
 tuples in Manifold. Tuples are used extensively in Manifold and their
-elements could previously only be accessed using numeric indexes. This was not
+fields could previously only be accessed using numeric indexes. This was not
 semantically meaningful and made the usage of tuples confusing. One way we improved the usage of tuples
 was by extending
-Manifold with the ability to unpack tuple elements. Unpacking of a tuple's
+Manifold with the ability to unpack tuple fields. Unpacking of a tuple's
 fields is a common of functional programming languages, and involves declaring
-variables with a tuple on the left-hand side of an assignment expression. We
-also added named elements to tuples, inspired by Python's \texttt{NamedTuple}
-class. Naming elements means that a programmer can refer an element of a tuple using a
-index or the name of that element. Named elements increase the readability of
-Manifold and offers a language construct similar to structs in C or record
-data types in Haskell. These language features are shown in \autoref{lst:unpacking}.
+variables using a tuple on the left-hand side of an assignment expression. We
+also added named fields to tuples, inspired by Python's \texttt{NamedTuple}
+class. Naming fields means that a programmer can refer a field of a tuple using a
+index or the name of that field. Named fields increase the readability of
+Manifold and helps users of the language coming from languages like C that offer this functionality
+with structs or a similar data type. These tuple language features are shown in \autoref{lst:unpacking}.
 
 \begin{lstlisting}[label=lst:unpacking, caption=Examples of new tuple features]
 and = primitive node (in0: digitalIn, in1: digitalIn) -> (out: digitalOut);
@@ -144,7 +143,7 @@ halfAdder = (a: Bool, b: Bool) -> (sum: Bool, carry: Bool) {
 (sum, carry) = halfAdder(true, false)
 
 b = (pin0=sum, pin1=carry);
-// Access an element in b by name
+// Access an field in b by name
 outputPin(in=b.pin0);
 \end{lstlisting}
 
