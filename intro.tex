@@ -2,8 +2,8 @@
 
 The field of microfluidic device engineering currently suffers from a lack of accessible tools for circuit design and analysis.
 Engineers currently need to develop systems of equations that represent their circuits by hand \cite{Thorsen02science}.
-They must then manually solve these equations to determine the system's viability.
-With Manifold, engineers can describe their microfluidic systems in a functional programming style. 
+One must then manually solve these equations to determine the system's viability. This is often limiting because computation time for simulating each component is significant using techniques such as finite element analysis, which limits the scalability of designs. Since there are often complex components involved in a microfluidic circuit, better computer aided design tools are required to simulate and verify the systemic behavior of connected components to allow rapid prototyping of designs.
+With Manifold, engineers can describe their complete microfluidic systems in a functional programming style. 
 Manifold converts this system code into inputs for third-party solver tools, which can then perform an analysis of the system described in the code.
 The Manifold framework was first introduced by Berzish et. al in \cite{Berzish16cascon}.
 This work follows up on the recent features that have been added to the toolchain.
